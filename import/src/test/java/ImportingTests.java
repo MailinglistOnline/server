@@ -65,7 +65,7 @@ public class ImportingTests {
     }
 
     @Before
-    public void setUp() throws UnknownHostException {
+    public void setUp() throws UnknownHostException, IOException {
         dbClient = new DbClient(mongoUrl, databaseName, mongoPort, collectionName);
     }
 
@@ -77,7 +77,6 @@ public class ImportingTests {
     @Test
     public void testMboxNumberOfMessages() throws UnknownHostException, NoSuchProviderException, MessagingException, IOException {
         MboxImporter mbox = new MboxImporter(dbClient);
-        
         mbox.importMbox(TEST_MAILS_PATH);
         assertEquals(dbClient.emailCount(), 62);
         mbox.importMbox(TEST_MAILS_PATH);

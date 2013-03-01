@@ -40,7 +40,7 @@ public class DbClient {
         String databaseUrl = prop.getProperty("defaultMongoUrl");
         String defaultDatabaseName = prop.getProperty("defaultDatabaseName");
         String defaultCollectionName = prop.getProperty("defaultCollection");
-        connect(databaseUrl, databaseUrl, defaultPort, defaultCollectionName);
+        connect(databaseUrl, defaultDatabaseName, defaultPort, defaultCollectionName);
 
     }
 
