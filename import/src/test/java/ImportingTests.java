@@ -88,7 +88,7 @@ public class ImportingTests {
 
     @Test
     public void testSaveMessage() throws AddressException, MessagingException {
-        final String address = "address";
+        final String address = "address@adress.sk";
         final String text = "abc";
         MimeMessage message = new MimeMessage(Session.getDefaultInstance(new Properties()));
         message.setFrom(new InternetAddress(address));
@@ -136,7 +136,7 @@ public class ImportingTests {
 
         DBObject testObj = dbClient.findFirstMessageWithMessageId("<4E7CA9DA.9040904@gmail.com>");
         assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<4E7CA9DA.9040904@gmail.com>"));
-        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("Martin Kyrc <martin.kyrc@gmail.com>"));
+        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("martin.kyrc@gmail.com"));
         assertEquals(((BasicBSONList) testObj.get(Email.MAILINGLIST_MONGO_TAG)).get(0), "linux@lists.linux.sk");
         assertEquals((testObj.get(Email.ROOT_MONGO_TAG)), "true");
         assertNull(((BasicBSONList) (testObj.get(Email.ATTACHMENTS_MONGO_TAG))));
@@ -145,7 +145,7 @@ public class ImportingTests {
 
         testObj = dbClient.findFirstMessageWithMessageId("<CAJ37LfSeBctpzD3WS7Cbm2G_uD7c-eSkcBYJ=FtVRRqXc4GWnw@mail.gmail.com>");
         assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<CAJ37LfSeBctpzD3WS7Cbm2G_uD7c-eSkcBYJ=FtVRRqXc4GWnw@mail.gmail.com>"));
-        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("Juraj Remenec <remenec@gmail.com>"));
+        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("remenec@gmail.com"));
         BasicDBObject replyToDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<d7f794ac9a203ebc1d49776968da0d61@localhost>");
         assertTrue((testObj).get(Email.IN_REPLY_TO_MONGO_TAG).equals(replyToDoc.getString("_id")));
         assertEquals(((BasicBSONList) testObj.get(Email.MAILINGLIST_MONGO_TAG)).get(0), "linux@lists.linux.sk");
@@ -159,7 +159,7 @@ public class ImportingTests {
         assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<4F2A6865.3030805@lavabit.com>"));
         replyToDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<20120127193813.GG25134@athena.platon.sk>");
         BasicDBObject rootDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<CAJ37LfR9GUeEQ=EQJvvZ4BSoL489F=a2DUwAK1r4Ebb4tw=haA@mail.gmail.com>");
-        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("rabgulo <rabgulo@lavabit.com>"));
+        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("rabgulo@lavabit.com"));
         assertTrue((testObj).get(Email.IN_REPLY_TO_MONGO_TAG).equals(replyToDoc.getString("_id")));
         assertEquals((testObj.get(Email.ROOT_MONGO_TAG)), rootDoc.getString("_id"));
         assertEquals(((BasicBSONList) testObj.get(Email.MAILINGLIST_MONGO_TAG)).get(0), "linux@lists.linux.sk");
@@ -169,7 +169,7 @@ public class ImportingTests {
 
         testObj = dbClient.findFirstMessageWithMessageId("<20120214202407.GI6838@ksp.sk>");
         assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<20120214202407.GI6838@ksp.sk>"));
-        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("Michal Petrucha <michal.petrucha@ksp.sk>"));
+        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("michal.petrucha@ksp.sk"));
         replyToDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<20120203104407.GA27369@fantomas.sk>");
         rootDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<CAJ37LfR9GUeEQ=EQJvvZ4BSoL489F=a2DUwAK1r4Ebb4tw=haA@mail.gmail.com>");
         assertEquals((testObj.get(Email.ROOT_MONGO_TAG)), rootDoc.getString("_id"));
@@ -185,7 +185,7 @@ public class ImportingTests {
         replyToDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<20120201114442.GX6838@ksp.sk>");
         rootDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<CAJ37LfR9GUeEQ=EQJvvZ4BSoL489F=a2DUwAK1r4Ebb4tw=haA@mail.gmail.com>");
         assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<20120203104407.GA27369@fantomas.sk>"));
-        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("Matus UHLAR - fantomas <uhlar@fantomas.sk>"));
+        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("uhlar@fantomas.sk"));
         assertEquals(((BasicBSONList) testObj.get(Email.MAILINGLIST_MONGO_TAG)).get(0), "linux@lists.linux.sk");
         assertEquals((testObj.get(Email.ROOT_MONGO_TAG)), rootDoc.getString("_id"));
         assertTrue((testObj).get(Email.IN_REPLY_TO_MONGO_TAG).equals(replyToDoc.getString("_id")));
@@ -223,7 +223,7 @@ public class ImportingTests {
         assertEquals(1, dbClient.emailCount());
         DBObject testObj = dbClient.findFirstMessageWithMessageId("<4E7CA9DA.9040904@gmail.com>");
         assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<4E7CA9DA.9040904@gmail.com>"));
-        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("Martin Kyrc <martin.kyrc@gmail.com>"));
+        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("martin.kyrc@gmail.com"));
         writeDBItems();
     }
 }

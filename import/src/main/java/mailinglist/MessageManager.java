@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
@@ -15,6 +17,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import mailinglist.entities.ContentPart;
 import mailinglist.entities.Email;
+
 
 /**
  *
@@ -49,7 +52,8 @@ public class MessageManager {
             String inReplyTo = dbClient.getId(message.getHeader("In-Reply-To")[0], mailingLists);
             email.setInReplyTo(inReplyTo);
         }
-        email.setFrom(message.getFrom()[0].toString());
+        String fromField = extractEmailAddress(message.getFrom()[0].toString());
+        email.setFrom(fromField);
         List<ContentPart> list = getContentParts(message);
         email.setSubject(message.getSubject());
         email.setMainContent(list.get(0));
@@ -77,6 +81,22 @@ public class MessageManager {
 
         return email;
 
+    }
+    
+    
+    private String extractEmailAddress(String address) {
+
+        Pattern emailPattern = Pattern.compile("\\S+@\\S+"); 
+        Matcher matcher = emailPattern.matcher(address);  
+        if(matcher.find()) {
+           String email= matcher.group(); 
+           if(email.startsWith("<") && email.endsWith(">")) {
+               email= email.substring(1, email.length()-1);
+           }
+           return email;
+        }
+        return null;
+        
     }
 
     public boolean saveMessage(Email message) throws MessagingException, IOException {
