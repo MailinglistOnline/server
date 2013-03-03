@@ -53,7 +53,8 @@ public class ImportingTests {
     private String databaseName = "testdb";
     private String collectionName = "test";
 
-    public ImportingTests() {
+    public ImportingTests() throws UnknownHostException {
+        dbClient = new DbClient(mongoUrl, databaseName, mongoPort, collectionName);
     }
 
     @BeforeClass
@@ -65,8 +66,8 @@ public class ImportingTests {
     }
 
     @Before
-    public void setUp() throws UnknownHostException, IOException {
-        dbClient = new DbClient(mongoUrl, databaseName, mongoPort, collectionName);
+    public void setUp(){
+        
     }
 
     @After

@@ -7,6 +7,7 @@ package mailinglist.entities;
 import com.mongodb.BasicDBObject;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import javax.naming.Reference;
 
 
@@ -29,6 +30,11 @@ public class Email extends BasicDBObject{
     public static final String FROM_MONGO_TAG = "from";
     public static final String MAIN_CONTENT_MONGO_TAG = "mainContent";
     
+    
+    public Email() {
+        super();
+        put(REPLIES_MONGO_TAG,new ArrayList());
+    }
     
     public String getId() {
         return getString(ID_MONGO_TAG);
@@ -55,6 +61,14 @@ public class Email extends BasicDBObject{
             list = (ArrayList<String>)get(REPLIES_MONGO_TAG);
         }
         list.add(replyId);
+    }
+    
+    public List<String> getReplies() {
+       return (ArrayList<String>)get(REPLIES_MONGO_TAG);
+    }
+    
+    public void setReplies(List<String> replies) {
+       put(REPLIES_MONGO_TAG,replies);
     }
 
     public void setInReplyTo(String inReplyTo) {
@@ -130,6 +144,8 @@ public class Email extends BasicDBObject{
         ArrayList<ContentPart> list = (ArrayList<ContentPart>)get(ATTACHMENTS_MONGO_TAG);
         return list;
     }
+
+    
 
 
 }

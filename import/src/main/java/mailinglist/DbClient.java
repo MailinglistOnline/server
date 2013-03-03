@@ -64,7 +64,7 @@ public class DbClient {
         coll.setInternalClass(Email.ATTACHMENTS_MONGO_TAG + ".5" , ContentPart.class);
     }
 
-    public boolean saveMessage(Email email) throws MessagingException, IOException {
+    public boolean saveMessage(Email email) throws IOException {
 
         if (getId(email.getMessageId(), email.getMessageMailingLists()) != null) {
             return false;
@@ -117,13 +117,9 @@ public class DbClient {
         return objects;
     }
 
-    public String getId(String messageId, ArrayList<String> mailinglistOneCommon) {
+    public String getId(String messageId, ArrayList<String> mailinglist) {
         BasicDBObject emailObject = new BasicDBObject("message_id", messageId);
-        BasicDBObject mailingListQuery = new BasicDBObject("$in", mailinglistOneCommon);
-        if(mailinglistOneCommon == null) {
-            mailinglistOneCommon= new ArrayList<String>();
-        }
-        emailObject.put("mailinglist", mailingListQuery);
+        emailObject.put("mailinglist", mailinglist);
         BasicDBObject findOne = (BasicDBObject) coll.findOne(emailObject);
         if (findOne == null) {
             return null;
