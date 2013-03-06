@@ -20,10 +20,8 @@ public class MessageReceiver {
 
     
     public static void main(String[] args) throws MessagingException, IOException {
-
         Session s = Session.getDefaultInstance(new Properties());
         MimeMessage message = new MimeMessage(s, System.in);
-
         System.out.println("Message ID: " + message.getMessageID());
         System.out.println("Message content: " + message.getContent().toString());
         DbClient messageSaver;
@@ -34,5 +32,6 @@ public class MessageReceiver {
         }
         MessageManager manager= new MessageManager(messageSaver);
         manager.saveMessage(manager.createMessage(message));
+        //messageSaver.closeConnection();
     }
 }

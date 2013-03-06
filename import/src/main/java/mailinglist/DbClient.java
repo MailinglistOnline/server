@@ -9,7 +9,6 @@ import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
 import java.io.IOException;
@@ -17,7 +16,6 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import javax.mail.MessagingException;
 import mailinglist.entities.ContentPart;
 import mailinglist.entities.Email;
 import org.bson.types.ObjectId;
@@ -31,6 +29,7 @@ public class DbClient {
     private static String DATABASE_PROPERTIES_FILE_NAME = "database.properties";
     
     List<String> mailingLists;
+    MongoClient mongoClient;
     DBCollection coll;
 
     public DbClient() throws UnknownHostException, IOException {
@@ -47,11 +46,16 @@ public class DbClient {
     public DbClient(String mongoUrl, String databaseName, int mongoPort, String collectionName) throws UnknownHostException {
         connect(mongoUrl, databaseName, mongoPort, collectionName);
     }
+    
+    public void closeConnection() {
+        mongoClient.close();
+    }
 
     private void connect(String mongoUrl, String databaseName, int mongoPort, String collectionName) throws UnknownHostException {
        
-        MongoClient mongoClient = new MongoClient(mongoUrl, mongoPort);
+        mongoClient = new MongoClient(mongoUrl, mongoPort);
         DB db = mongoClient.getDB(databaseName);
+
         mongoClient.setWriteConcern(WriteConcern.SAFE);
         coll = db.getCollection(collectionName);
         coll.setObjectClass(Email.class);
@@ -62,6 +66,7 @@ public class DbClient {
         coll.setInternalClass(Email.ATTACHMENTS_MONGO_TAG + ".3" , ContentPart.class);
         coll.setInternalClass(Email.ATTACHMENTS_MONGO_TAG + ".4" , ContentPart.class);
         coll.setInternalClass(Email.ATTACHMENTS_MONGO_TAG + ".5" , ContentPart.class);
+        
     }
 
     public boolean saveMessage(Email email) throws IOException {
@@ -116,10 +121,16 @@ public class DbClient {
         }
         return objects;
     }
+    
+    /*
+     * Returns the ID of the object, which has the given message_ID and has at least
+     * one common mailinglist with the list given.
+     */
 
     public String getId(String messageId, ArrayList<String> mailinglist) {
-        BasicDBObject emailObject = new BasicDBObject("message_id", messageId);
-        emailObject.put("mailinglist", mailinglist);
+        BasicDBObject emailObject = new BasicDBObject(Email.MESSAGE_ID_MONGO_TAG, messageId);
+        BasicDBObject mailinglistQuery = new BasicDBObject("$in",mailinglist);
+        emailObject.put(Email.MAILINGLIST_MONGO_TAG, mailinglistQuery);
         BasicDBObject findOne = (BasicDBObject) coll.findOne(emailObject);
         if (findOne == null) {
             return null;

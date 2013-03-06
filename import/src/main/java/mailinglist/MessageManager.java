@@ -35,12 +35,12 @@ public class MessageManager {
         mailingLists = new ArrayList<String>();
         Properties prop = new Properties();
         prop.load(DbClient.class.getClassLoader().getResourceAsStream((MAILINGLISTS_PROPERTIES_FILE_NAME)));
-        String mailinglist = "";
+        String mailinglist = prop.getProperty("mailinglist." + 1);
         int i = 1;
         while (mailinglist != null) {
-            mailinglist = prop.getProperty("mailinglist." + i);
             mailingLists.add(mailinglist);
             i++;
+            mailinglist =  prop.getProperty("mailinglist." + i);
         }
     }
 
@@ -48,10 +48,7 @@ public class MessageManager {
         Email email = new Email();
         email.setMessageId(message.getMessageID());
         email.setSentDate(message.getSentDate());
-        if (message.getHeader("In-Reply-To") != null) {
-            String inReplyTo = dbClient.getId(message.getHeader("In-Reply-To")[0], mailingLists);
-            email.setInReplyTo(inReplyTo);
-        }
+        
         String fromField = extractEmailAddress(message.getFrom()[0].toString());
         email.setFrom(fromField);
         List<ContentPart> list = getContentParts(message);
@@ -65,6 +62,11 @@ public class MessageManager {
                 email.addMailingList(ad.getAddress());
             }
 
+        }
+        
+        if (message.getHeader("In-Reply-To") != null) {
+            String inReplyTo = dbClient.getId(message.getHeader("In-Reply-To")[0], email.getMessageMailingLists());
+            email.setInReplyTo(inReplyTo);
         }
         //setRoot
 
