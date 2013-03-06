@@ -2,7 +2,9 @@
 import database.DbClient;
 import database.entities.Email;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -35,8 +37,10 @@ public class EmailResource {
      @GET
     @Path("/")
     @Produces("application/xml")
-    public Email getEmailById(@QueryParam("id") String id) {
-        return dbClient.getEmailWithId(id);
+    public List<Email> getEmailById(@QueryParam("id") String id) {
+         ArrayList<Email> list= new ArrayList<Email>();
+         list.add(dbClient.getEmailWithId(id));
+         return list;
     }
     
     @GET

@@ -29,6 +29,7 @@ public class DbClient {
     private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "mailinglists.properties";
     List<String> mailingLists;
     DBCollection coll;
+    MongoClient mongoClient;
 
     public DbClient() throws UnknownHostException, IOException {
         Properties prop = new Properties();
@@ -46,7 +47,7 @@ public class DbClient {
     }
 
     private void connect(String mongoUrl, String databaseName, int mongoPort, String collectionName) throws UnknownHostException {
-        MongoClient mongoClient = new MongoClient(mongoUrl, mongoPort);
+        mongoClient = new MongoClient(mongoUrl, mongoPort);
         DB db = mongoClient.getDB(databaseName);
         mongoClient.setWriteConcern(WriteConcern.SAFE);
         coll = db.getCollection(collectionName);
@@ -58,6 +59,10 @@ public class DbClient {
         coll.setInternalClass(Email.ATTACHMENTS_MONGO_TAG + ".3" , ContentPart.class);
         coll.setInternalClass(Email.ATTACHMENTS_MONGO_TAG + ".4" , ContentPart.class);
         coll.setInternalClass(Email.ATTACHMENTS_MONGO_TAG + ".5" , ContentPart.class);
+    }
+    
+    public void closeConnection() {
+        mongoClient.close();
     }
 
     

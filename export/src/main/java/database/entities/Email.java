@@ -17,6 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  *
  * @author matej
  */
+
 @XmlRootElement(name = "email")
 @XmlAccessorOrder
 public class Email extends BasicDBObject{
@@ -39,12 +40,12 @@ public class Email extends BasicDBObject{
         put(REPLIES_MONGO_TAG,new ArrayList());
     }
     
-    @XmlElement
+    @XmlElement(name="id")
     public String getId() {
         return getString(ID_MONGO_TAG);
         
     }
-    @XmlElement
+    @XmlElement(name="root")
     public String getRoot() {
         return getString(ROOT_MONGO_TAG);
     }
@@ -58,7 +59,7 @@ public class Email extends BasicDBObject{
     }
 
 
-    @XmlElement
+    @XmlElement(name="in_reply_to")
     public String getInReplyTo() {
         return getString(IN_REPLY_TO_MONGO_TAG);
     }
@@ -99,7 +100,7 @@ public class Email extends BasicDBObject{
         }
         list.add(mailinglist);
     }
-    @XmlElement
+    @XmlElement(name="message_id")
     public String getMessageId() {
         return getString(MESSAGE_ID_MONGO_TAG);
     }
@@ -107,7 +108,7 @@ public class Email extends BasicDBObject{
     public void setMessageId(String messageId) {
         put(MESSAGE_ID_MONGO_TAG, messageId);
     }
-    @XmlElement
+    @XmlElement(name="subject")
     public String getSubject() {
         return getString(SUBJECT_MONGO_TAG);
     }
@@ -115,7 +116,7 @@ public class Email extends BasicDBObject{
     public void setSubject(String subject) {
          put(SUBJECT_MONGO_TAG, subject);
     }
-    @XmlElement
+    @XmlElement(name="sent_date")
     public Date getSentDate() {
         return getDate(DATE_MONGO_TAG);
     }
@@ -131,7 +132,7 @@ public class Email extends BasicDBObject{
        return list;
        
     }
-    @XmlElement
+    @XmlElement(name="from")
     public String getFrom() {
         return getString(FROM_MONGO_TAG);
     }
@@ -140,7 +141,7 @@ public class Email extends BasicDBObject{
          put(FROM_MONGO_TAG, from);
     }
 
-    @XmlElement
+    @XmlElement(name="main_content")
     public ContentPart getMainContent() {
         
         ContentPart cp=(ContentPart)get(MAIN_CONTENT_MONGO_TAG);
