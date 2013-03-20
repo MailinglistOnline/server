@@ -11,6 +11,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import org.jboss.resteasy.annotations.providers.jaxb.Wrapped;
 
 
 /*
@@ -33,10 +34,18 @@ public class EmailResource {
         dbClient = new DbClient();
     }
     
+    @GET
+    @Path("/all")
+    @Produces("application/xml")
+    @Wrapped(element="emails")
+    public List<Email> getAllEmails() {
+        return dbClient.getAllEmails();
+    }
     
      @GET
-    @Path("/")
+    @Path("/email")
     @Produces("application/xml")
+    @Wrapped(element="emails")
     public List<Email> getEmailById(@QueryParam("id") String id) {
          ArrayList<Email> list= new ArrayList<Email>();
          list.add(dbClient.getEmailWithId(id));
@@ -44,44 +53,44 @@ public class EmailResource {
     }
     
     @GET
-    @Path("/all")
+    @Path("/email")
     @Produces("application/xml")
-    public List<Email> getAllEmails() {
-        return dbClient.getAllEmails();
-    }
-    
-    @GET
-    @Path("/")
-    @Produces("application/xml")
+    @Wrapped(element="emails")
     public List<Email> getEmailByAuthor(@QueryParam("from") String author) {
         return dbClient.getEmailsFrom(author);
          
     }
     
     @GET
-    @Path("/roots/all")
+    @Path("/mailinglist/roots/all")
     @Produces("application/xml")
+    @Wrapped(element="emails")
     public List<Email> getMailingListRoots(@QueryParam("mailinglist") String mailinglist) {
         return dbClient.getMailinglistRoot(mailinglist);
          
     }
     
     @GET
-    @Path("/roots/{number}")
+    @Path("/mailinglist/roots/")
     @Produces("application/xml")
-    public List<Email> getMailingListRoots(@PathParam("number") int number,@QueryParam("mailinglist") String mailinglist) {
+    @Wrapped(element="emails")
+    public List<Email> getMailingListRoots(@QueryParam("from") int fromNumber,@QueryParam("to") int toNumber,@QueryParam("mailinglist") String mailinglist) {
         List<Email> list=dbClient.getMailinglistRoot(mailinglist);
-        if(number>list.size()-1) {
-            number=list.size();
+        if(fromNumber > toNumber) {
+            return new ArrayList<Email>();
         }
-        return list.subList(0, number);
+        if(toNumber>list.size()-1) {
+            toNumber=list.size();
+        }
+        return list.subList(fromNumber, toNumber);
          
     }
     
     
     @GET
-    @Path("/whole_path/")
+    @Path("/thread/")
     @Produces("application/xml")
+    @Wrapped(element="emails")
     public List<Email> getEmailPath(@QueryParam("id") String id) {
         List<Email> list=dbClient.getWholePathFromId(id);
         return list;
