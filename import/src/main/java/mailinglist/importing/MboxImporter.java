@@ -18,6 +18,8 @@ import javax.mail.URLName;
 import javax.mail.internet.MimeMessage;
 import mailinglist.DbClient;
 import mailinglist.MessageManager;
+import mailinglist.entities.Email;
+import net.fortuna.mstor.MStorFolder;
 
 /**
  *
@@ -33,7 +35,7 @@ public class MboxImporter {
     public static void main(String[] args) throws NoSuchProviderException, MessagingException, IOException {
         DbClient msgSaver = new DbClient();
         MboxImporter mbox = new MboxImporter(msgSaver);
-        
+
 
         if (args.length == 1) {
             File file = new File(args[0]);
@@ -44,7 +46,7 @@ public class MboxImporter {
             }
 
         } else {
-            
+
             System.out.println("Call the method with one parameter (mbox path)");
         }
 
@@ -54,7 +56,30 @@ public class MboxImporter {
         messageSaver = msgSaver;
     }
 
-    private void importMboxDirectory(String string) {
+    public void importMboxDirectory(String directoryPath) throws NoSuchProviderException, IOException, MessagingException {
+        File directory = new File(directoryPath);
+        File[] subfiles = directory.listFiles();
+        String mboxDirectory = directoryPath;
+        Properties props = new Properties();
+        props.setProperty("mstor.mbox.metadataStrategy", "none");
+        Session session = Session.getDefaultInstance(props);
+        MessageManager manager = new MessageManager(messageSaver);
+        Store store = session.getStore(new URLName("mstor:" + mboxDirectory));
+        store.connect();
+        for (File file : subfiles) {
+            if (file.isDirectory()) {
+                importMboxDirectory(file.getAbsolutePath());
+            }
+            String mboxFile = file.getName();
+            Folder inbox = store.getDefaultFolder().getFolder(mboxFile);
+            inbox.open(Folder.READ_ONLY);
+            Message[] messages = inbox.getMessages();
+            System.out.println("Importing" + messages.length + "messages.");
+            for (Message m : messages) {
+                    manager.createAndSaveMessage((MimeMessage) m);
+            } 
+        }
+        store.close();
     }
 
     public void importMbox(String mboxPath) throws NoSuchProviderException, MessagingException, IOException {
@@ -66,19 +91,16 @@ public class MboxImporter {
         Session session = Session.getDefaultInstance(props);
         Store store = session.getStore(new URLName("mstor:" + mboxDirectory));
         store.connect();
-        Folder inbox = store.getDefaultFolder().getFolder(mboxFile);
+        MStorFolder inbox = (MStorFolder) store.getDefaultFolder().getFolder(mboxFile);
         inbox.open(Folder.READ_ONLY);
-
         Message[] messages = inbox.getMessages();
         System.out.println("Importing" + messages.length + "messages.");
-        MessageManager manager= new MessageManager(messageSaver);
+        MessageManager manager = new MessageManager(messageSaver);
         for (Message m : messages) {
-            try {
-                
-                manager.saveMessage(manager.createMessage((MimeMessage)m));
-            } catch (IOException ex) {
-            }
+                manager.createAndSaveMessage((MimeMessage) m);
         }
+        store.close();
         System.out.println("Done.");
+
     }
 }

@@ -4,12 +4,16 @@
  */
 package mailinglist;
 
+import exceptions.MalformedMessageException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.mail.Address;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
@@ -44,7 +48,10 @@ public class MessageManager {
         }
     }
 
-    public Email createMessage(MimeMessage message) throws MessagingException, IOException {
+    public Email createMessage(MimeMessage message) throws MessagingException, IOException, MalformedMessageException {
+        if(message.getMessageID() == null && message.getFrom() == null) {
+            throw new MalformedMessageException();
+        }
         Email email = new Email();
         email.setMessageId(message.getMessageID());
         email.setSentDate(message.getSentDate());
@@ -57,9 +64,11 @@ public class MessageManager {
         for (int i = 1; i < list.size(); i++) {
             email.addAttachment(list.get(i));
         }
-        for (InternetAddress ad : (InternetAddress[]) message.getAllRecipients()) {
-            if (mailingLists.contains(ad.getAddress())) {
-                email.addMailingList(ad.getAddress());
+        Address[] addresses =message.getAllRecipients();
+        for (Address ad :  addresses) {
+            InternetAddress iad= (InternetAddress) ad;
+            if (mailingLists.contains(iad.getAddress())) {
+                email.addMailingList(iad.getAddress());
             }
 
         }
@@ -158,5 +167,20 @@ public class MessageManager {
         }
 
         return list;
+    }
+
+    public boolean createAndSaveMessage(MimeMessage mimeMessage) {
+        try {
+            Email message=createMessage(mimeMessage);
+            saveMessage(message);
+            return true;
+        } catch (MessagingException ex) {
+            Logger.getLogger(MessageManager.class.getName()).log(Level.INFO, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(MessageManager.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (MalformedMessageException ex) {
+            Logger.getLogger(MessageManager.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
     }
 }

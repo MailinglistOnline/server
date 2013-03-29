@@ -4,7 +4,6 @@ package test;
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import java.io.ByteArrayInputStream;
@@ -46,9 +45,11 @@ import static org.junit.Assert.*;
  * @author matej
  */
 public class ImportingTests {
-    public static final String TEST_MAILS_PATH = "src/test/java/test-mails";
-    public static final String SIMPLE_MAIL_PATH = "src/test/java/simpleMail";
 
+    public static final String TEST_MAILS_PATH = "src/test/java/mboxes/test-mails";
+    public static final String TEST_MAILS_PATH2 ="src/test/java/mboxes/test-mails2";
+    public static final String SIMPLE_MAIL_PATH ="src/test/java/mboxes/simpleMail";
+    public static final String MBOX_FOLDER_PATH ="src/test/java/mboxes/folder";
     private DbClient dbClient;
     private int mongoPort = 27017;
     private String mongoUrl = "localhost";
@@ -68,8 +69,7 @@ public class ImportingTests {
     }
 
     @Before
-    public void setUp(){
-        
+    public void setUp() {
     }
 
     @After
@@ -89,7 +89,18 @@ public class ImportingTests {
     }
 
     @Test
-    public void testSaveMessage() throws AddressException, MessagingException {
+    public void testMboxFolderNumberOfMessages() throws UnknownHostException, NoSuchProviderException, MessagingException, IOException {
+        MboxImporter mbox = new MboxImporter(dbClient);
+        mbox.importMboxDirectory(MBOX_FOLDER_PATH);
+        assertEquals(72+62, dbClient.emailCount());
+        mbox.importMboxDirectory(MBOX_FOLDER_PATH);
+        assertEquals(dbClient.emailCount(), 72+62);
+        writeDBItems();
+
+    }
+
+    @Test
+    public void testSaveMessage() throws AddressException, MessagingException, IOException {
         final String address = "address@adress.sk";
         final String text = "abc";
         MimeMessage message = new MimeMessage(Session.getDefaultInstance(new Properties()));
@@ -98,24 +109,20 @@ public class ImportingTests {
         message.setHeader("Message-ID", text);
         message.setRecipient(Message.RecipientType.TO, new InternetAddress("linux@lists.linux.sk"));
         message.addRecipient(Message.RecipientType.TO, new InternetAddress(address));
-        try {
-            MessageManager manager= new MessageManager(dbClient);
-            manager.saveMessage(manager.createMessage(message));
-        }catch(IOException ex) {
-            fail();
-        }
+        MessageManager manager = new MessageManager(dbClient);
+        assertTrue(manager.createAndSaveMessage(message));
         assertEquals(1, dbClient.emailCount());
-        Email email=(Email) dbClient.findFirstMessageWithMessageId(text);
-        ContentPart cp= email.getMainContent();
-        assertEquals(text,email.getMainContent().getContent());
-        assertEquals(text,email.getMessageId());
-        assertEquals(address,email.getFrom());
-        
+        Email email = (Email) dbClient.findFirstMessageWithMessageId(text);
+        ContentPart cp = email.getMainContent();
+        assertEquals(text, email.getMainContent().getContent());
+        assertEquals(text, email.getMessageId());
+        assertEquals(address, email.getFrom());
+
 
     }
 
     private void writeDBItems() {
-        List<Email> objects =dbClient.getAllEmails();
+        List<Email> objects = dbClient.getAllEmails();
         for (BasicDBObject email : objects) {
             System.out.println("ID: " + email.getString("_id"));
             System.out.println("ID: " + email.get("_id"));
@@ -135,6 +142,7 @@ public class ImportingTests {
     public void testMboxMessageAttributes() throws UnknownHostException, NoSuchProviderException, MessagingException, IOException {
         MboxImporter mbox = new MboxImporter(dbClient);
         mbox.importMbox(TEST_MAILS_PATH);
+        mbox.importMbox(TEST_MAILS_PATH2);
 
         DBObject testObj = dbClient.findFirstMessageWithMessageId("<4E7CA9DA.9040904@gmail.com>");
         assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<4E7CA9DA.9040904@gmail.com>"));
@@ -142,8 +150,8 @@ public class ImportingTests {
         assertEquals(((BasicBSONList) testObj.get(Email.MAILINGLIST_MONGO_TAG)).get(0), "linux@lists.linux.sk");
         assertEquals((testObj.get(Email.ROOT_MONGO_TAG)), "true");
         assertNull(((BasicBSONList) (testObj.get(Email.ATTACHMENTS_MONGO_TAG))));
-        assertEquals("text/plain",((BasicDBObject)testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
-        assertTrue(((BasicDBObject)testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("ahojte,"));
+        assertEquals("text/plain", ((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
+        assertTrue(((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("ahojte,"));
 
         testObj = dbClient.findFirstMessageWithMessageId("<CAJ37LfSeBctpzD3WS7Cbm2G_uD7c-eSkcBYJ=FtVRRqXc4GWnw@mail.gmail.com>");
         assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<CAJ37LfSeBctpzD3WS7Cbm2G_uD7c-eSkcBYJ=FtVRRqXc4GWnw@mail.gmail.com>"));
@@ -153,8 +161,8 @@ public class ImportingTests {
         assertEquals(((BasicBSONList) testObj.get(Email.MAILINGLIST_MONGO_TAG)).get(0), "linux@lists.linux.sk");
         assertEquals((testObj.get(Email.ROOT_MONGO_TAG)), replyToDoc.getString("_id"));
         assertNull(((BasicBSONList) (testObj.get(Email.ATTACHMENTS_MONGO_TAG))));
-        assertEquals("text/plain",((BasicDBObject)testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
-        assertTrue(((BasicDBObject)testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("Kedysika"));
+        assertEquals("text/plain", ((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
+        assertTrue(((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("Kedysika"));
         //assertEquals(((BasicBSONList) (testObj).get("replies")).size(), 1); V principe tam su, ale nie je v In-reply-to
 
         testObj = dbClient.findFirstMessageWithMessageId("<4F2A6865.3030805@lavabit.com>");
@@ -166,8 +174,8 @@ public class ImportingTests {
         assertEquals((testObj.get(Email.ROOT_MONGO_TAG)), rootDoc.getString("_id"));
         assertEquals(((BasicBSONList) testObj.get(Email.MAILINGLIST_MONGO_TAG)).get(0), "linux@lists.linux.sk");
         assertNull(((BasicBSONList) (testObj.get(Email.ATTACHMENTS_MONGO_TAG))));
-        assertEquals("text/plain",((BasicDBObject)testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
-        assertTrue(((BasicDBObject)testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("On 27.01.2012 20:38"));
+        assertEquals("text/plain", ((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
+        assertTrue(((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("On 27.01.2012 20:38"));
 
         testObj = dbClient.findFirstMessageWithMessageId("<20120214202407.GI6838@ksp.sk>");
         assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<20120214202407.GI6838@ksp.sk>"));
@@ -178,12 +186,12 @@ public class ImportingTests {
         assertEquals(((BasicBSONList) testObj.get(Email.MAILINGLIST_MONGO_TAG)).get(0), "linux@lists.linux.sk");
         assertTrue((testObj).get(Email.IN_REPLY_TO_MONGO_TAG).equals(replyToDoc.getString("_id")));
         assertEquals(((BasicBSONList) (testObj.get(Email.ATTACHMENTS_MONGO_TAG))).size(), 1);
-        assertEquals("text/plain",((BasicDBObject)testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
-        assertTrue(((BasicDBObject)testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("On Fri, Feb 03, 2012 at "));
+        assertEquals("text/plain", ((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
+        assertTrue(((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("On Fri, Feb 03, 2012 at "));
         // as we dont save the "sign"
 
         testObj = dbClient.findFirstMessageWithMessageId("<20120203104407.GA27369@fantomas.sk>");
-         
+
         replyToDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<20120201114442.GX6838@ksp.sk>");
         rootDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<CAJ37LfR9GUeEQ=EQJvvZ4BSoL489F=a2DUwAK1r4Ebb4tw=haA@mail.gmail.com>");
         assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<20120203104407.GA27369@fantomas.sk>"));
@@ -193,8 +201,21 @@ public class ImportingTests {
         assertTrue((testObj).get(Email.IN_REPLY_TO_MONGO_TAG).equals(replyToDoc.getString("_id")));
         assertEquals(1, ((BasicBSONList) testObj.get("replies")).size());
         assertNull(((BasicBSONList) (testObj.get(Email.ATTACHMENTS_MONGO_TAG))));
-        assertEquals("text/plain",((BasicDBObject)testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
-        assertTrue(((BasicDBObject)testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("On 01.02.12 12:44"));
+        assertEquals("text/plain", ((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
+        assertTrue(((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("On 01.02.12 12:44"));
+        
+        
+        Email email=(Email) dbClient.findFirstMessageWithMessageId("<1361268460-3092-7-git-send-email-swhiteho@redhat.com>");
+        assertNotNull(email);
+        assertTrue(email.getMessageId().equals("<1361268460-3092-7-git-send-email-swhiteho@redhat.com>"));
+        assertTrue(email.getFrom().equals("swhiteho@redhat.com"));
+        Email replyToEmail = (Email) dbClient.findFirstMessageWithMessageId("<1361268460-3092-1-git-send-email-swhiteho@redhat.com>");
+        Email rootEmail = (Email)dbClient.findFirstMessageWithMessageId("<1361268460-3092-1-git-send-email-swhiteho@redhat.com>");
+        assertEquals(email.getRoot(), rootEmail.getId());
+        assertEquals(email.getMessageMailingLists().get(0), "cluster-devel@redhat.com");
+        assertTrue(email.getInReplyTo().equals(replyToEmail.getId()));
+        assertEquals("text/plain", email.getMainContent().get("type"));
+        assertTrue(email.getMainContent().get("text").toString().startsWith("The freeze code "));
 
         writeDBItems();
 
@@ -202,12 +223,8 @@ public class ImportingTests {
 
     @Test
     public void testMessageReceiver() throws FileNotFoundException, IOException, MessagingException {
-
-
         InputStream old = System.in;
         String output;
-
-
         FileInputStream stream = new FileInputStream(new File(SIMPLE_MAIL_PATH));
         try {
             FileChannel fc = stream.getChannel();

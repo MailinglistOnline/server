@@ -31,7 +31,7 @@ public class MessageReceiver {
             messageSaver = new DbClient();
         }
         MessageManager manager= new MessageManager(messageSaver);
-        manager.saveMessage(manager.createMessage(message));
+        manager.createAndSaveMessage(message);
         //messageSaver.closeConnection();
     }
 }
