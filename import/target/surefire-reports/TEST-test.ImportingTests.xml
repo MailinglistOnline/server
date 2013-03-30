@@ -60,9 +60,9 @@
     <property name="sun.desktop" value="gnome"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase time="1.675" classname="test.ImportingTests" name="testMboxNumberOfMessages"/>
-  <testcase time="1.344" classname="test.ImportingTests" name="testMboxFolderNumberOfMessages"/>
-  <testcase time="0" classname="test.ImportingTests" name="testSaveMessage"/>
-  <testcase time="0.774" classname="test.ImportingTests" name="testMboxMessageAttributes"/>
+  <testcase time="1.695" classname="test.ImportingTests" name="testMboxNumberOfMessages"/>
+  <testcase time="1.342" classname="test.ImportingTests" name="testMboxFolderNumberOfMessages"/>
+  <testcase time="0.001" classname="test.ImportingTests" name="testSaveMessage"/>
+  <testcase time="0.749" classname="test.ImportingTests" name="testMboxMessageAttributes"/>
   <testcase time="0" classname="test.ImportingTests" name="testMessageReceiver"/>
 </testsuite>

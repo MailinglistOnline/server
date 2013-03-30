@@ -7,7 +7,9 @@ package mailinglist;
 import exceptions.MalformedMessageException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -21,7 +23,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import mailinglist.entities.ContentPart;
 import mailinglist.entities.Email;
-
 
 /**
  *
@@ -44,35 +45,35 @@ public class MessageManager {
         while (mailinglist != null) {
             mailingLists.add(mailinglist);
             i++;
-            mailinglist =  prop.getProperty("mailinglist." + i);
+            mailinglist = prop.getProperty("mailinglist." + i);
         }
     }
 
     public Email createMessage(MimeMessage message) throws MessagingException, IOException, MalformedMessageException {
-        if(message.getMessageID() == null && message.getFrom() == null) {
+        if (message.getMessageID() == null && message.getFrom() == null) {
             throw new MalformedMessageException();
         }
         Email email = new Email();
         email.setMessageId(message.getMessageID());
         email.setSentDate(message.getSentDate());
-        
+
         String fromField = extractEmailAddress(message.getFrom()[0].toString());
         email.setFrom(fromField);
-        List<ContentPart> list = getContentParts(message);
+        Map<String, List<ContentPart>> list = getContentParts(message,false);
         email.setSubject(message.getSubject());
-        email.setMainContent(list.get(0));
-        for (int i = 1; i < list.size(); i++) {
-            email.addAttachment(list.get(i));
+        email.setMainContent(list.get("main"));
+        if(!list.get("attachments").isEmpty()) {
+             email.setAttachments(list.get("attachments"));
         }
-        Address[] addresses =message.getAllRecipients();
-        for (Address ad :  addresses) {
-            InternetAddress iad= (InternetAddress) ad;
+        Address[] addresses = message.getAllRecipients();
+        for (Address ad : addresses) {
+            InternetAddress iad = (InternetAddress) ad;
             if (mailingLists.contains(iad.getAddress())) {
                 email.addMailingList(iad.getAddress());
             }
 
         }
-        
+
         if (message.getHeader("In-Reply-To") != null) {
             String inReplyTo = dbClient.getId(message.getHeader("In-Reply-To")[0], email.getMessageMailingLists());
             email.setInReplyTo(inReplyTo);
@@ -80,11 +81,12 @@ public class MessageManager {
         //setRoot
 
         if (email.getInReplyTo() != null) {
-            String root = dbClient.getRootAttribute(email.getInReplyTo());
-            if ("true".equals(root)) {
+            Email parent =(Email) dbClient.getMessage(email.getInReplyTo());
+            
+            if ("true".equals(parent.getRoot())) {
                 email.setRoot(email.getInReplyTo());
             } else {
-                email.setRoot(root);
+                email.setRoot(parent.getRoot());
             }
         } else {
             email.setRoot("true");
@@ -93,21 +95,20 @@ public class MessageManager {
         return email;
 
     }
-    
-    
+
     private String extractEmailAddress(String address) {
 
-        Pattern emailPattern = Pattern.compile("\\S+@\\S+"); 
-        Matcher matcher = emailPattern.matcher(address);  
-        if(matcher.find()) {
-           String email= matcher.group(); 
-           if(email.startsWith("<") && email.endsWith(">")) {
-               email= email.substring(1, email.length()-1);
-           }
-           return email;
+        Pattern emailPattern = Pattern.compile("\\S+@\\S+");
+        Matcher matcher = emailPattern.matcher(address);
+        if (matcher.find()) {
+            String email = matcher.group();
+            if (email.startsWith("<") && email.endsWith(">")) {
+                email = email.substring(1, email.length() - 1);
+            }
+            return email;
         }
         return null;
-        
+
     }
 
     public boolean saveMessage(Email message) throws MessagingException, IOException {
@@ -115,23 +116,32 @@ public class MessageManager {
         return true;
     }
 
-    private List<ContentPart> getContentParts(Part p) throws
+    private Map<String, List<ContentPart>> getContentParts(Part p, boolean mainPartFound) throws
             MessagingException, IOException {
-        List<ContentPart> list = new ArrayList<ContentPart>();
+        Map<String, List<ContentPart>> list = new HashMap();
+        list.put("main", new ArrayList<ContentPart>());
+        list.put("attachments", new ArrayList<ContentPart>());
         if (p.isMimeType("text/*")) {
-
             String s = (String) p.getContent();
             if (p.isMimeType("text/html")) {
                 ContentPart cp = new ContentPart();
                 cp.setType("text/html");
                 cp.setContent(s);
-                list.add(cp);
+                if (!mainPartFound) {
+                    list.get("main").add(cp);
+                } else {
+                    list.get("attachments").add(cp);
+                }
                 return list;
             } else {
                 ContentPart cp = new ContentPart();
                 cp.setType("text/plain");
                 cp.setContent(s);
-                list.add(cp);
+                if (!mainPartFound) {
+                    list.get("main").add(cp);
+                } else {
+                    list.get("attachments").add(cp);
+                }
                 return list;
             }
 
@@ -145,23 +155,41 @@ public class MessageManager {
                 Part bp = mp.getBodyPart(i);
                 if (bp.isMimeType("text/plain")) {
                     ContentPart cp = new ContentPart();
-                    cp.setType("alternative_text/plain");
+                    cp.setType("text/plain");
                     cp.setContent(bp.getContent().toString());
-                    list.add(cp);
+                    if (!mainPartFound) {
+                        list.get("main").add(cp);
+                    } else {
+                        list.get("attachments").add(cp);
+                    }
                 } else if (bp.isMimeType("text/html")) {
                     ContentPart cp = new ContentPart();
-                    cp.setType("alternative_text/html");
+                    cp.setType("text/html");
                     cp.setContent(bp.getContent().toString());
-                    list.add(cp);
+                    if (!mainPartFound) {
+                        list.get("main").add(cp);
+                    } else {
+                        list.get("attachments").add(cp);
+                    }
                 } else {
-                    list.addAll(getContentParts(bp));
+                    if (!mainPartFound) {
+                        list.get("main").addAll(getContentParts(bp,mainPartFound).get("main"));
+                    } else {
+                        list.get("attachments").addAll(getContentParts(bp,mainPartFound).get("attachments"));;
+                    }
                 }
             }
+            mainPartFound=true;
             return list;
         } else if (p.isMimeType("multipart/*")) {
             Multipart mp = (Multipart) p.getContent();
             for (int i = 0; i < mp.getCount(); i++) {
-                list.addAll(getContentParts(mp.getBodyPart(i)));
+                if (!mainPartFound) {
+                        list.get("main").addAll(getContentParts(mp.getBodyPart(i),mainPartFound).get("main"));
+                        mainPartFound=true;
+                    } else {
+                        list.get("attachments").addAll(getContentParts(mp.getBodyPart(i),mainPartFound).get("attachments"));
+                    }
             }
             return list;
         }
@@ -171,7 +199,7 @@ public class MessageManager {
 
     public boolean createAndSaveMessage(MimeMessage mimeMessage) {
         try {
-            Email message=createMessage(mimeMessage);
+            Email message = createMessage(mimeMessage);
             saveMessage(message);
             return true;
         } catch (MessagingException ex) {

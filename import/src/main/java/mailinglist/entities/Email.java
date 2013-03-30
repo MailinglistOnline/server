@@ -8,7 +8,6 @@ import com.mongodb.BasicDBObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.naming.Reference;
 
 
 
@@ -132,17 +131,22 @@ public class Email extends BasicDBObject{
     }
 
 
-    public ContentPart getMainContent() {
-        return (ContentPart)get(MAIN_CONTENT_MONGO_TAG);
+    public List<ContentPart> getMainContent() {
+        ArrayList<ContentPart> list = (ArrayList<ContentPart>)get(MAIN_CONTENT_MONGO_TAG);
+        return list;
     }
 
-    public void setMainContent(ContentPart mainContent) {
+    public void setMainContent(List<ContentPart> mainContent) {
          put(MAIN_CONTENT_MONGO_TAG, mainContent);
     }
 
     public ArrayList<ContentPart> getAttachments() {
         ArrayList<ContentPart> list = (ArrayList<ContentPart>)get(ATTACHMENTS_MONGO_TAG);
         return list;
+    }
+
+    public void setAttachments(List<ContentPart> attachments) {
+        put(ATTACHMENTS_MONGO_TAG,attachments);
     }
 
     

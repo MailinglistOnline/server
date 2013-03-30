@@ -113,8 +113,8 @@ public class ImportingTests {
         assertTrue(manager.createAndSaveMessage(message));
         assertEquals(1, dbClient.emailCount());
         Email email = (Email) dbClient.findFirstMessageWithMessageId(text);
-        ContentPart cp = email.getMainContent();
-        assertEquals(text, email.getMainContent().getContent());
+        ContentPart cp = email.getMainContent().get(0);
+        assertEquals(text, cp.getContent());
         assertEquals(text, email.getMessageId());
         assertEquals(address, email.getFrom());
 
@@ -144,78 +144,102 @@ public class ImportingTests {
         mbox.importMbox(TEST_MAILS_PATH);
         mbox.importMbox(TEST_MAILS_PATH2);
 
-        DBObject testObj = dbClient.findFirstMessageWithMessageId("<4E7CA9DA.9040904@gmail.com>");
-        assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<4E7CA9DA.9040904@gmail.com>"));
-        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("martin.kyrc@gmail.com"));
-        assertEquals(((BasicBSONList) testObj.get(Email.MAILINGLIST_MONGO_TAG)).get(0), "linux@lists.linux.sk");
-        assertEquals((testObj.get(Email.ROOT_MONGO_TAG)), "true");
-        assertNull(((BasicBSONList) (testObj.get(Email.ATTACHMENTS_MONGO_TAG))));
-        assertEquals("text/plain", ((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
-        assertTrue(((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("ahojte,"));
+        Email email=(Email) dbClient.findFirstMessageWithMessageId("<4E7CA9DA.9040904@gmail.com>");
+        assertTrue(email.getMessageId().equals("<4E7CA9DA.9040904@gmail.com>"));
+        assertTrue(email.getFrom().equals("martin.kyrc@gmail.com"));
+        assertEquals(email.getMessageMailingLists().get(0), "linux@lists.linux.sk");
+        assertEquals(email.getRoot(), "true");
+        assertNull(email.getAttachments());
+        assertEquals("text/plain", email.getMainContent().get(0).getType());
+        assertTrue(email.getMainContent().get(0).getContent().toString().startsWith("ahojte,"));
 
-        testObj = dbClient.findFirstMessageWithMessageId("<CAJ37LfSeBctpzD3WS7Cbm2G_uD7c-eSkcBYJ=FtVRRqXc4GWnw@mail.gmail.com>");
-        assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<CAJ37LfSeBctpzD3WS7Cbm2G_uD7c-eSkcBYJ=FtVRRqXc4GWnw@mail.gmail.com>"));
-        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("remenec@gmail.com"));
-        BasicDBObject replyToDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<d7f794ac9a203ebc1d49776968da0d61@localhost>");
-        assertTrue((testObj).get(Email.IN_REPLY_TO_MONGO_TAG).equals(replyToDoc.getString("_id")));
-        assertEquals(((BasicBSONList) testObj.get(Email.MAILINGLIST_MONGO_TAG)).get(0), "linux@lists.linux.sk");
-        assertEquals((testObj.get(Email.ROOT_MONGO_TAG)), replyToDoc.getString("_id"));
-        assertNull(((BasicBSONList) (testObj.get(Email.ATTACHMENTS_MONGO_TAG))));
-        assertEquals("text/plain", ((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
-        assertTrue(((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("Kedysika"));
+        email = (Email) dbClient.findFirstMessageWithMessageId("<CAJ37LfSeBctpzD3WS7Cbm2G_uD7c-eSkcBYJ=FtVRRqXc4GWnw@mail.gmail.com>");
+        assertTrue(email.getMessageId().equals("<CAJ37LfSeBctpzD3WS7Cbm2G_uD7c-eSkcBYJ=FtVRRqXc4GWnw@mail.gmail.com>"));
+        assertTrue(email.getFrom().equals("remenec@gmail.com"));
+        Email replyToEmail = (Email) dbClient.findFirstMessageWithMessageId("<d7f794ac9a203ebc1d49776968da0d61@localhost>");
+        assertTrue(email.getInReplyTo().equals(replyToEmail.getId()));
+        assertEquals(email.getMessageMailingLists().get(0), "linux@lists.linux.sk");
+        assertEquals(email.getRoot(), replyToEmail.getId());
+        assertNull(email.getAttachments());
+        assertEquals("text/plain", email.getMainContent().get(0).getType());
+        assertTrue(email.getMainContent().get(0).getContent().startsWith("Kedysika"));
         //assertEquals(((BasicBSONList) (testObj).get("replies")).size(), 1); V principe tam su, ale nie je v In-reply-to
 
-        testObj = dbClient.findFirstMessageWithMessageId("<4F2A6865.3030805@lavabit.com>");
-        assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<4F2A6865.3030805@lavabit.com>"));
-        replyToDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<20120127193813.GG25134@athena.platon.sk>");
-        BasicDBObject rootDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<CAJ37LfR9GUeEQ=EQJvvZ4BSoL489F=a2DUwAK1r4Ebb4tw=haA@mail.gmail.com>");
-        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("rabgulo@lavabit.com"));
-        assertTrue((testObj).get(Email.IN_REPLY_TO_MONGO_TAG).equals(replyToDoc.getString("_id")));
-        assertEquals((testObj.get(Email.ROOT_MONGO_TAG)), rootDoc.getString("_id"));
-        assertEquals(((BasicBSONList) testObj.get(Email.MAILINGLIST_MONGO_TAG)).get(0), "linux@lists.linux.sk");
-        assertNull(((BasicBSONList) (testObj.get(Email.ATTACHMENTS_MONGO_TAG))));
-        assertEquals("text/plain", ((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
-        assertTrue(((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("On 27.01.2012 20:38"));
+        email =(Email) dbClient.findFirstMessageWithMessageId("<4F2A6865.3030805@lavabit.com>");
+        assertTrue(email.getMessageId().equals("<4F2A6865.3030805@lavabit.com>"));
+        replyToEmail = (Email) dbClient.findFirstMessageWithMessageId("<20120127193813.GG25134@athena.platon.sk>");
+        Email rootEmail = (Email) dbClient.findFirstMessageWithMessageId("<CAJ37LfR9GUeEQ=EQJvvZ4BSoL489F=a2DUwAK1r4Ebb4tw=haA@mail.gmail.com>");
+        assertTrue(email.getFrom().equals("rabgulo@lavabit.com"));
+        assertTrue(email.getInReplyTo().equals(replyToEmail.getId()));
+        assertEquals(email.getRoot(), rootEmail.getId());
+        assertEquals(email.getMessageMailingLists().get(0), "linux@lists.linux.sk");
+        assertNull(email.getAttachments());
+        assertEquals("text/plain", email.getMainContent().get(0).getType());
+        assertTrue( email.getMainContent().get(0).getContent().startsWith("On 27.01.2012 20:38"));
 
-        testObj = dbClient.findFirstMessageWithMessageId("<20120214202407.GI6838@ksp.sk>");
-        assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<20120214202407.GI6838@ksp.sk>"));
-        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("michal.petrucha@ksp.sk"));
-        replyToDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<20120203104407.GA27369@fantomas.sk>");
-        rootDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<CAJ37LfR9GUeEQ=EQJvvZ4BSoL489F=a2DUwAK1r4Ebb4tw=haA@mail.gmail.com>");
-        assertEquals((testObj.get(Email.ROOT_MONGO_TAG)), rootDoc.getString("_id"));
-        assertEquals(((BasicBSONList) testObj.get(Email.MAILINGLIST_MONGO_TAG)).get(0), "linux@lists.linux.sk");
-        assertTrue((testObj).get(Email.IN_REPLY_TO_MONGO_TAG).equals(replyToDoc.getString("_id")));
-        assertEquals(((BasicBSONList) (testObj.get(Email.ATTACHMENTS_MONGO_TAG))).size(), 1);
-        assertEquals("text/plain", ((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
-        assertTrue(((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("On Fri, Feb 03, 2012 at "));
+        email =(Email) dbClient.findFirstMessageWithMessageId("<20120214202407.GI6838@ksp.sk>");
+        assertTrue(email.getMessageId().equals("<20120214202407.GI6838@ksp.sk>"));
+        assertTrue(email.getFrom().equals("michal.petrucha@ksp.sk"));
+        replyToEmail = (Email) dbClient.findFirstMessageWithMessageId("<20120203104407.GA27369@fantomas.sk>");
+        rootEmail = (Email) dbClient.findFirstMessageWithMessageId("<CAJ37LfR9GUeEQ=EQJvvZ4BSoL489F=a2DUwAK1r4Ebb4tw=haA@mail.gmail.com>");
+        assertEquals(email.getRoot(), rootEmail.getId());
+        assertEquals(email.getMessageMailingLists().get(0), "linux@lists.linux.sk");
+        assertTrue(email.getInReplyTo().equals(replyToEmail.getId()));
+        assertEquals(email.getAttachments().size(), 1);
+        assertEquals("text/plain", email.getMainContent().get(0).getType());
+        assertTrue(email.getMainContent().get(0).getContent().startsWith("On Fri, Feb 03, 2012 at "));
         // as we dont save the "sign"
 
-        testObj = dbClient.findFirstMessageWithMessageId("<20120203104407.GA27369@fantomas.sk>");
+        email = (Email)dbClient.findFirstMessageWithMessageId("<20120203104407.GA27369@fantomas.sk>");
 
-        replyToDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<20120201114442.GX6838@ksp.sk>");
-        rootDoc = (BasicDBObject) dbClient.findFirstMessageWithMessageId("<CAJ37LfR9GUeEQ=EQJvvZ4BSoL489F=a2DUwAK1r4Ebb4tw=haA@mail.gmail.com>");
-        assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<20120203104407.GA27369@fantomas.sk>"));
-        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("uhlar@fantomas.sk"));
-        assertEquals(((BasicBSONList) testObj.get(Email.MAILINGLIST_MONGO_TAG)).get(0), "linux@lists.linux.sk");
-        assertEquals((testObj.get(Email.ROOT_MONGO_TAG)), rootDoc.getString("_id"));
-        assertTrue((testObj).get(Email.IN_REPLY_TO_MONGO_TAG).equals(replyToDoc.getString("_id")));
-        assertEquals(1, ((BasicBSONList) testObj.get("replies")).size());
-        assertNull(((BasicBSONList) (testObj.get(Email.ATTACHMENTS_MONGO_TAG))));
-        assertEquals("text/plain", ((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("type"));
-        assertTrue(((BasicDBObject) testObj.get(Email.MAIN_CONTENT_MONGO_TAG)).get("text").toString().startsWith("On 01.02.12 12:44"));
+        replyToEmail = (Email) dbClient.findFirstMessageWithMessageId("<20120201114442.GX6838@ksp.sk>");
+        rootEmail = (Email) dbClient.findFirstMessageWithMessageId("<CAJ37LfR9GUeEQ=EQJvvZ4BSoL489F=a2DUwAK1r4Ebb4tw=haA@mail.gmail.com>");
+        assertTrue(email.getMessageId().equals("<20120203104407.GA27369@fantomas.sk>"));
+        assertTrue(email.getFrom().equals("uhlar@fantomas.sk"));
+        assertEquals(email.getMessageMailingLists().get(0), "linux@lists.linux.sk");
+        assertEquals(email.getRoot(), rootEmail.getId());
+        assertTrue(email.getInReplyTo().equals(replyToEmail.getId()));
+        assertEquals(1, email.getReplies().size());
+        assertNull(email.getAttachments());
+        assertEquals("text/plain", email.getMainContent().get(0).getType());
+        assertTrue(email.getMainContent().get(0).getContent().startsWith("On 01.02.12 12:44"));
         
         
-        Email email=(Email) dbClient.findFirstMessageWithMessageId("<1361268460-3092-7-git-send-email-swhiteho@redhat.com>");
+        email=(Email) dbClient.findFirstMessageWithMessageId("<1361268460-3092-7-git-send-email-swhiteho@redhat.com>");
         assertNotNull(email);
         assertTrue(email.getMessageId().equals("<1361268460-3092-7-git-send-email-swhiteho@redhat.com>"));
         assertTrue(email.getFrom().equals("swhiteho@redhat.com"));
-        Email replyToEmail = (Email) dbClient.findFirstMessageWithMessageId("<1361268460-3092-1-git-send-email-swhiteho@redhat.com>");
-        Email rootEmail = (Email)dbClient.findFirstMessageWithMessageId("<1361268460-3092-1-git-send-email-swhiteho@redhat.com>");
+        replyToEmail = (Email) dbClient.findFirstMessageWithMessageId("<1361268460-3092-1-git-send-email-swhiteho@redhat.com>");
+        rootEmail = (Email)dbClient.findFirstMessageWithMessageId("<1361268460-3092-1-git-send-email-swhiteho@redhat.com>");
         assertEquals(email.getRoot(), rootEmail.getId());
         assertEquals(email.getMessageMailingLists().get(0), "cluster-devel@redhat.com");
         assertTrue(email.getInReplyTo().equals(replyToEmail.getId()));
-        assertEquals("text/plain", email.getMainContent().get("type"));
-        assertTrue(email.getMainContent().get("text").toString().startsWith("The freeze code "));
+        assertEquals("text/plain", email.getMainContent().get(0).get("type"));
+        assertTrue(email.getMainContent().get(0).get("text").toString().startsWith("The freeze code "));
+        
+        email=(Email) dbClient.findFirstMessageWithMessageId("<1361885169.2705.12.camel@menhir>");
+        assertNotNull(email);
+        assertTrue(email.getMessageId().equals("<1361885169.2705.12.camel@menhir>"));
+        assertTrue(email.getFrom().equals("swhiteho@redhat.com"));
+        assertEquals(email.getRoot(), "true");
+        assertEquals(email.getMessageMailingLists().get(0), "cluster-devel@redhat.com");
+        assertNull(email.getInReplyTo());
+        assertEquals("text/plain", email.getMainContent().get(0).get("type"));
+        assertTrue(email.getMainContent().get(0).getContent().startsWith("This patch cleans up "));
+        
+        email=(Email) dbClient.findFirstMessageWithMessageId("<1361268460-3092-6-git-send-email-swhiteho@redhat.com>");
+        assertNotNull(email);
+        assertTrue(email.getMessageId().equals("<1361268460-3092-6-git-send-email-swhiteho@redhat.com>"));
+        assertTrue(email.getFrom().equals("swhiteho@redhat.com"));
+        replyToEmail = (Email) dbClient.findFirstMessageWithMessageId("<1361268460-3092-1-git-send-email-swhiteho@redhat.com>");
+        rootEmail = (Email)dbClient.findFirstMessageWithMessageId("<1361268460-3092-1-git-send-email-swhiteho@redhat.com>");
+        assertEquals(email.getRoot(), rootEmail.getId());
+        assertEquals(email.getMessageMailingLists().get(0), "cluster-devel@redhat.com");
+        assertTrue(email.getInReplyTo().equals(replyToEmail.getId()));
+        assertEquals("text/plain", email.getMainContent().get(0).getType());
+        assertTrue(email.getMainContent().get(0).getContent().startsWith("The locking in gfs2_attach_bufdata() "));
+        
+        
 
         writeDBItems();
 
@@ -240,9 +264,9 @@ public class ImportingTests {
         MessageReceiver.main(args);
         testInput.close();
         assertEquals(1, dbClient.emailCount());
-        DBObject testObj = dbClient.findFirstMessageWithMessageId("<4E7CA9DA.9040904@gmail.com>");
-        assertTrue((testObj).get(Email.MESSAGE_ID_MONGO_TAG).equals("<4E7CA9DA.9040904@gmail.com>"));
-        assertTrue((testObj).get(Email.FROM_MONGO_TAG).toString().equals("martin.kyrc@gmail.com"));
+        Email email = (Email) dbClient.findFirstMessageWithMessageId("<4E7CA9DA.9040904@gmail.com>");
+        assertTrue(email.getMessageId().equals("<4E7CA9DA.9040904@gmail.com>"));
+        assertTrue(email.getFrom().equals("martin.kyrc@gmail.com"));
         writeDBItems();
     }
 }
