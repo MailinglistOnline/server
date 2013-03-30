@@ -91,6 +91,9 @@ public class Email extends BasicDBObject{
         }
         list.add(part);
     }
+    public void setAttachments(List<ContentPart> attachments) {
+        put(ATTACHMENTS_MONGO_TAG,attachments);
+    }
 
     public void addMailingList(String mailinglist) {
         ArrayList<String>list = (ArrayList<String>)get(MAILINGLIST_MONGO_TAG);
@@ -141,14 +144,14 @@ public class Email extends BasicDBObject{
          put(FROM_MONGO_TAG, from);
     }
 
-    @XmlElement(name="main_content")
-    public ContentPart getMainContent() {
-        
-        ContentPart cp=(ContentPart)get(MAIN_CONTENT_MONGO_TAG);
-        return cp;
+    @XmlElementWrapper(name="main_content")
+    @XmlElement(name="alternative")
+    public ArrayList<ContentPart> getMainContent() {
+        ArrayList<ContentPart> list = (ArrayList<ContentPart>)get(MAIN_CONTENT_MONGO_TAG);
+        return list;
     }
 
-    public void setMainContent(ContentPart mainContent) {
+    public void setMainContent(List<ContentPart> mainContent) {
          put(MAIN_CONTENT_MONGO_TAG, mainContent);
     }
     

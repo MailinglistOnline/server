@@ -51,8 +51,11 @@ public class DbClient {
         DB db = mongoClient.getDB(databaseName);
         mongoClient.setWriteConcern(WriteConcern.SAFE);
         coll = db.getCollection(collectionName);
-        coll.setObjectClass(Email.class);
-        coll.setInternalClass(Email.MAIN_CONTENT_MONGO_TAG, ContentPart.class);
+         coll.setObjectClass(Email.class);
+        coll.setInternalClass(Email.MAIN_CONTENT_MONGO_TAG+ ".0", ContentPart.class);
+        coll.setInternalClass(Email.MAIN_CONTENT_MONGO_TAG+ ".1", ContentPart.class);
+        coll.setInternalClass(Email.MAIN_CONTENT_MONGO_TAG+ ".2", ContentPart.class);
+        coll.setInternalClass(Email.MAIN_CONTENT_MONGO_TAG+ ".3", ContentPart.class);
         coll.setInternalClass(Email.ATTACHMENTS_MONGO_TAG + ".0" , ContentPart.class);
         coll.setInternalClass(Email.ATTACHMENTS_MONGO_TAG + ".1" , ContentPart.class);
         coll.setInternalClass(Email.ATTACHMENTS_MONGO_TAG + ".2" , ContentPart.class);
