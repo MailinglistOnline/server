@@ -2,13 +2,17 @@
 import database.DbClient;
 import database.entities.Email;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ejb.EJB;
+import javax.ejb.Stateless;
+import javax.enterprise.context.ApplicationScoped;
+import javax.faces.bean.RequestScoped;
+
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import org.jboss.resteasy.annotations.providers.jaxb.Wrapped;
@@ -24,10 +28,11 @@ import org.jboss.resteasy.annotations.providers.jaxb.Wrapped;
  * @author matej
  */
 
-
+@RequestScoped
 @Path("/emails")
 public class EmailResource {
     
+    @Inject
     DbClient dbClient;
     
     public EmailResource() throws UnknownHostException, IOException {

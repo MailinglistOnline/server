@@ -17,6 +17,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import javax.ejb.Stateless;
+import javax.faces.bean.ApplicationScoped;
+
 import javax.mail.MessagingException;
 import org.bson.types.ObjectId;
 
@@ -24,10 +27,11 @@ import org.bson.types.ObjectId;
  *
  * @author matej
  */
+@ApplicationScoped
 public class DbClient {
     private static String DATABASE_PROPERTIES_FILE_NAME = "database.properties";
     private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "mailinglists.properties";
-    List<String> mailingLists;
+    List<String> mailingLists = new ArrayList<String>();
     DBCollection coll;
     MongoClient mongoClient;
 
@@ -39,7 +43,21 @@ public class DbClient {
         String defaultDatabaseName = prop.getProperty("defaultDatabaseName");
         String defaultCollectionName = prop.getProperty("defaultCollection");
         connect(databaseUrl, defaultDatabaseName, defaultPort, defaultCollectionName);
+        readMailinglists();
 
+    }
+    
+    public void readMailinglists() throws IOException {
+        Properties prop = new Properties();
+        prop.load(DbClient.class.getClassLoader().getResourceAsStream((MAILINGLISTS_PROPERTIES_FILE_NAME)));
+        String mailinglist = prop.getProperty("mailinglist." + 1);
+        int i = 1;
+        while (mailinglist != null) {
+            mailingLists.add(mailinglist);
+            i++;
+            mailinglist = prop.getProperty("mailinglist." + i);
+        }
+        
     }
 
     public DbClient(String mongoUrl, String databaseName, int mongoPort, String collectionName) throws UnknownHostException {
@@ -177,6 +195,10 @@ public class DbClient {
            replyPath.add(replyEmail);
        }
        return replyPath;
+    }
+
+    public List<String> getMailingLists() {
+        return mailingLists;
     }
 
 }
