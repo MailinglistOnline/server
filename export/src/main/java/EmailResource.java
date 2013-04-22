@@ -50,11 +50,11 @@ public class EmailResource {
      @GET
     @Path("/email")
     @Produces("application/xml")
-    @Wrapped(element="emails")
-    public List<Email> getEmailById(@QueryParam("id") String id) {
+   // @Wrapped(element="emails")
+    public Email getEmailById(@QueryParam("id") String id) {
          ArrayList<Email> list= new ArrayList<Email>();
-         list.add(dbClient.getEmailWithId(id));
-         return list;
+         return dbClient.getEmailWithId(id);
+
     }
     
     @GET
