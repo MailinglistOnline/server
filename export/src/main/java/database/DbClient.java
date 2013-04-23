@@ -201,4 +201,13 @@ public class DbClient {
         return mailingLists;
     }
 
+    public List<Email> getEmailReplies(String id) {
+        Email email = getEmailWithId(id);
+        List<Email> result = new ArrayList<Email>();
+        for (String replyId : email.getReplies()) {
+            result.add(getEmailWithId(replyId));
+        }
+        return result;
+    }
+
 }

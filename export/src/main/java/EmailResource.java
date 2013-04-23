@@ -56,6 +56,16 @@ public class EmailResource {
          return dbClient.getEmailWithId(id);
 
     }
+     
+      @GET
+    @Path("/email/repliesfrom/")
+    @Produces("application/xml")
+    @Wrapped(element="emails")
+    public List<Email> getEmailReplies(@QueryParam("id") String id) {
+         ArrayList<Email> list= new ArrayList<Email>();
+         return dbClient.getEmailReplies(id);
+
+    }
     
     @GET
     @Path("/email")
