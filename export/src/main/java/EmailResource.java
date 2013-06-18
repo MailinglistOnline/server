@@ -36,7 +36,7 @@ public class EmailResource {
     DbClient dbClient;
     
     public EmailResource() throws UnknownHostException, IOException {
-        dbClient = new DbClient();
+        
     }
     
     @GET
@@ -52,19 +52,17 @@ public class EmailResource {
     @Produces("application/xml")
     @Wrapped(element="emails")
     public Email getEmailById(@QueryParam("id") String id) {
-         //ArrayList<Email> list= new ArrayList<Email>();
          return dbClient.getEmailWithId(id);
 
     }
      
-      @GET
+    @GET
     @Path("/replies/id")
     @Produces("application/xml")
     @Wrapped(element="emails")
     public List<Email> getEmailReplies(@QueryParam("id") String id) {
          ArrayList<Email> list= new ArrayList<Email>();
          return dbClient.getEmailReplies(id);
-
     }
     
     @GET
@@ -111,6 +109,35 @@ public class EmailResource {
         return list;
          
     }
+    
+    @GET
+    @Path("/from/")
+    @Produces("application/xml")
+    @Wrapped(element="emails")
+    public List<Email> getEmailsFromAddress(@QueryParam("from") String from) {
+        List<Email> list=dbClient.getEmailsFromAddress(from);
+        return list;
+    }
+    
+    @GET
+    @Path("/mailinglist/latest/")
+    @Produces("application/xml")
+    @Wrapped(element="emails")
+    public List<Email> getMailingLatest(@QueryParam("mailinglist") String mailinglist,@QueryParam("from") int number) {
+         return dbClient.getMailinglistLatest(mailinglist,number);
+    }
+    
+    // NOW COMES SEARCH  METHODS:
+    
+    @GET
+    @Path("/search/content/")
+    @Produces("application/xml")
+    @Wrapped(element="emails")
+    public List<Email> searchEmailContent(@QueryParam("content") String content) {
+        List<Email> list=dbClient.searchByContent(content);
+        return list;
+    }
+    
     
  
 }

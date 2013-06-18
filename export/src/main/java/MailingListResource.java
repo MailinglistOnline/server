@@ -25,14 +25,13 @@ import org.jboss.resteasy.annotations.providers.jaxb.Wrapped;
 @ApplicationScoped
 @Path("/mailinglists")
 public class MailingListResource {
-
+    @Inject
+    DbClient dbClient;
     
     
     public MailingListResource() throws UnknownHostException, IOException {
-        dbClient = new DbClient();
     }
-    @Inject
-    DbClient dbClient;
+
 
     
     @GET

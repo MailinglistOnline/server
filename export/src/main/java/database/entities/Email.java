@@ -33,6 +33,7 @@ public class Email extends BasicDBObject{
     public static final String DATE_MONGO_TAG = "date";
     public static final String FROM_MONGO_TAG = "from";
     public static final String MAIN_CONTENT_MONGO_TAG = "mainContent";
+    public static final String TAGS_MONGO_TAG = "tags";
     
     
     public Email() {
@@ -143,6 +144,8 @@ public class Email extends BasicDBObject{
     public void setFrom(String from) {
          put(FROM_MONGO_TAG, from);
     }
+    
+    
 
     @XmlElementWrapper(name="main_content")
     @XmlElement(name="alternative")
@@ -160,6 +163,17 @@ public class Email extends BasicDBObject{
     public ArrayList<ContentPart> getAttachments() {
         ArrayList<ContentPart> list =(ArrayList<ContentPart>) get(ATTACHMENTS_MONGO_TAG);
         return list;
+    }
+    
+    
+    @XmlElement(name="tags")
+    public ArrayList<String> getTags() {
+        ArrayList<String> list =(ArrayList<String>) get(TAGS_MONGO_TAG);
+        return list;
+    }
+    
+    public void setTags(List<String> tags) {
+        put(TAGS_MONGO_TAG,tags);
     }
 
 

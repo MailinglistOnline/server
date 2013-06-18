@@ -17,6 +17,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
+import javax.annotation.PreDestroy;
+import javax.ejb.Singleton;
 import javax.ejb.Stateless;
 import javax.faces.bean.ApplicationScoped;
 
@@ -28,6 +31,7 @@ import org.bson.types.ObjectId;
  * @author matej
  */
 @ApplicationScoped
+@Singleton
 public class DbClient {
     private static String DATABASE_PROPERTIES_FILE_NAME = "database.properties";
     private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "mailinglists.properties";
@@ -82,6 +86,7 @@ public class DbClient {
         coll.setInternalClass(Email.ATTACHMENTS_MONGO_TAG + ".5" , ContentPart.class);
     }
     
+    @PreDestroy
     public void closeConnection() {
         mongoClient.close();
     }
@@ -209,5 +214,27 @@ public class DbClient {
         }
         return result;
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    // TODO: implement the methods
+
+    public List<Email> searchByContent(String content) {
+//         BasicDBObject textSearchCommand = new BasicDBObject();
+//        textSearchCommand.put("text", collectionName);
+//        textSearchCommand.put("search", textToSearchFor);
+//        final CommandResult commandResult = db.command(textSearchCommand);
+        return null;
+    }
+
+	public List<Email> getEmailsFromAddress(String from) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
