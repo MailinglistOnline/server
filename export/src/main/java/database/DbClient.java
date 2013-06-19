@@ -8,6 +8,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
 import database.entities.ContentPart;
@@ -35,6 +36,7 @@ import org.bson.types.ObjectId;
 public class DbClient {
     private static String DATABASE_PROPERTIES_FILE_NAME = "database.properties";
     private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "mailinglists.properties";
+
     List<String> mailingLists = new ArrayList<String>();
     DBCollection coll;
     MongoClient mongoClient;
@@ -154,6 +156,13 @@ public class DbClient {
          return true;
         }
     
+    public boolean updateEmail(Email newEmail) throws IOException {
+
+        coll.save(newEmail);
+
+         return true;
+        }
+    
     
      public String getId(String messageId, ArrayList<String> mailinglist) {
         BasicDBObject emailObject = new BasicDBObject("message_id", messageId);
@@ -215,13 +224,38 @@ public class DbClient {
         return result;
     }
     
+    public void addTagToEmail(String emailId, String tag) {
+		Email email = getEmailWithId(emailId);
+		email.addTag(tag);
+		try {
+			updateEmail(email);
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+	}
     
+    public List<Email> getMailinglistLatest(String mailinglist, int number) {
+		BasicDBObject query= new BasicDBObject();
+		coll.setObjectClass(Email.class);
+		query.append(Email.MAILINGLIST_MONGO_TAG,mailinglist);
+		DBObject orderBy = new BasicDBObject();
+		orderBy.put(Email.DATE_MONGO_TAG, 1);
+        DBCursor cursor = coll.find(query).sort(orderBy);
+        List<Email> emails = new ArrayList<Email>();
+        try {
+            while (cursor.hasNext() && number >0) {
+                Email email = (Email) cursor.next();
+                emails.add(email);
+                number = number -1;
+            }
+        } finally {
+            cursor.close();
+        }
+        return emails;
+	}
     
-    
-    
-    
-    
-    
+
     // TODO: implement the methods
 
     public List<Email> searchByContent(String content) {
@@ -236,5 +270,9 @@ public class DbClient {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	
+
+	
 
 }

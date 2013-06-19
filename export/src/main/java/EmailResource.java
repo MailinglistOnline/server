@@ -12,6 +12,8 @@ import javax.faces.bean.RequestScoped;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -123,8 +125,22 @@ public class EmailResource {
     @Path("/mailinglist/latest/")
     @Produces("application/xml")
     @Wrapped(element="emails")
-    public List<Email> getMailingLatest(@QueryParam("mailinglist") String mailinglist,@QueryParam("from") int number) {
+    public List<Email> getMailingLatest(@QueryParam("mailinglist") String mailinglist,@QueryParam("number") int number) {
          return dbClient.getMailinglistLatest(mailinglist,number);
+    }
+    
+    @GET
+    @Path("/mailinglist/latest/")
+    @Produces("application/xml")
+    @Wrapped(element="emails")
+    public List<Email> getMailinglistLatest(@QueryParam("mailinglist") String mailinglist, @QueryParam("number") int number) {
+    	return dbClient.getMailinglistLatest(mailinglist, number);
+    }
+    
+    @POST
+    @Path("/email/tag/")
+    public void addTag(@QueryParam("id") String id,@QueryParam("tag") String tag) {
+    	dbClient.addTagToEmail(id,tag);
     }
     
     // NOW COMES SEARCH  METHODS:

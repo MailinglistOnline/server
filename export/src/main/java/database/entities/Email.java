@@ -175,6 +175,17 @@ public class Email extends BasicDBObject{
     public void setTags(List<String> tags) {
         put(TAGS_MONGO_TAG,tags);
     }
+    
+
+    
+    public void addTag(String tag) {
+        ArrayList<String>list = (ArrayList<String>)get(TAGS_MONGO_TAG);
+        if(list == null) {
+            append(TAGS_MONGO_TAG,new ArrayList<String>());
+            list = (ArrayList<String>)get(TAGS_MONGO_TAG);
+        }
+        list.add(tag);
+    }
 
 
 }
