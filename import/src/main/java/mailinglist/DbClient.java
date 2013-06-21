@@ -78,7 +78,7 @@ public class DbClient {
             return false;
         } 
         coll.insert(email);
-        if ( email.getInReplyTo() != null) {
+        if ( email.getInReplyTo() != null && !email.getInReplyTo().startsWith("not found email")) {
 
             Email parent =(Email)coll.findOne(new ObjectId(email.getInReplyTo()));
             parent.addReply(email.getId());

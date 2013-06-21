@@ -48,6 +48,10 @@ public class MessageManager {
             mailinglist = prop.getProperty("mailinglist." + i);
         }
     }
+    
+    public void addMailinglistToProperties(String mailinglist) {
+        // automaticly detect new mailinglists or not?
+    }
 
     public Email createMessage(MimeMessage message) throws MessagingException, IOException, MalformedMessageException {
         if (message.getMessageID() == null && message.getFrom() == null) {
@@ -66,21 +70,33 @@ public class MessageManager {
              email.setAttachments(list.get("attachments"));
         }
         Address[] addresses = message.getAllRecipients();
+        List<String> stringAddresses = new ArrayList<String>();
+        
         for (Address ad : addresses) {
             InternetAddress iad = (InternetAddress) ad;
-            if (mailingLists.contains(iad.getAddress())) {
-                email.addMailingList(iad.getAddress());
+            stringAddresses.add(iad.getAddress());
+            if (mailingLists.contains(iad.getAddress().toLowerCase())) {
+                email.addMailingList(iad.getAddress().toLowerCase());
             }
-
+        }
+        if ( email.getMessageMailingLists()==null) {
+            System.out.println("Not found mailinglist in addresses :" + stringAddresses);
+            System.out.println("Email with messageId " + email.getMessageId() + " was not registered");
+            return null;
         }
 
         if (message.getHeader("In-Reply-To") != null) {
             String inReplyTo = dbClient.getId(message.getHeader("In-Reply-To")[0], email.getMessageMailingLists());
-            email.setInReplyTo(inReplyTo);
+            if(inReplyTo != null) {
+                email.setInReplyTo(inReplyTo);
+            } else {
+                email.setInReplyTo("not found email for (" + message.getHeader("In-Reply-To")[0] + ")" );
+            }
+            
         }
         //setRoot
 
-        if (email.getInReplyTo() != null) {
+        if (email.getInReplyTo() != null && !email.getInReplyTo().startsWith("not found email for")) {
             Email parent =(Email) dbClient.getMessage(email.getInReplyTo());
             
             if ("true".equals(parent.getRoot())) {
@@ -112,8 +128,7 @@ public class MessageManager {
     }
 
     public boolean saveMessage(Email message) throws MessagingException, IOException {
-        dbClient.saveMessage(message);
-        return true;
+        return dbClient.saveMessage(message);
     }
 
     private Map<String, List<ContentPart>> getContentParts(Part p, boolean mainPartFound) throws
@@ -200,7 +215,9 @@ public class MessageManager {
     public boolean createAndSaveMessage(MimeMessage mimeMessage) {
         try {
             Email message = createMessage(mimeMessage);
-            saveMessage(message);
+            if (message != null) {
+                saveMessage(message);
+            }
             return true;
         } catch (MessagingException ex) {
             Logger.getLogger(MessageManager.class.getName()).log(Level.INFO, null, ex);

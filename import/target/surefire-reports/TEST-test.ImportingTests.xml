@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite failures="0" time="3.846" errors="0" skipped="0" tests="5" name="test.ImportingTests">
+<testsuite failures="0" time="3.833" errors="0" skipped="0" tests="5" name="test.ImportingTests">
   <properties>
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
     <property name="sun.boot.library.path" value="/usr/java/jdk1.7.0_11/jre/lib/amd64"/>
@@ -60,9 +60,9 @@
     <property name="sun.desktop" value="gnome"/>
     <property name="sun.cpu.isalist" value=""/>
   </properties>
-  <testcase time="1.695" classname="test.ImportingTests" name="testMboxNumberOfMessages"/>
-  <testcase time="1.342" classname="test.ImportingTests" name="testMboxFolderNumberOfMessages"/>
-  <testcase time="0.001" classname="test.ImportingTests" name="testSaveMessage"/>
-  <testcase time="0.749" classname="test.ImportingTests" name="testMboxMessageAttributes"/>
+  <testcase time="1.67" classname="test.ImportingTests" name="testMboxNumberOfMessages"/>
+  <testcase time="1.359" classname="test.ImportingTests" name="testMboxFolderNumberOfMessages"/>
+  <testcase time="0" classname="test.ImportingTests" name="testSaveMessage"/>
+  <testcase time="0.756" classname="test.ImportingTests" name="testMboxMessageAttributes"/>
   <testcase time="0" classname="test.ImportingTests" name="testMessageReceiver"/>
 </testsuite>
