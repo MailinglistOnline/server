@@ -240,7 +240,7 @@ public class DbClient {
 		coll.setObjectClass(Email.class);
 		query.append(Email.MAILINGLIST_MONGO_TAG,mailinglist);
 		DBObject orderBy = new BasicDBObject();
-		orderBy.put(Email.DATE_MONGO_TAG, 1);
+		orderBy.put(Email.DATE_MONGO_TAG, -1);
         DBCursor cursor = coll.find(query).sort(orderBy);
         List<Email> emails = new ArrayList<Email>();
         try {
