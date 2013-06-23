@@ -11,19 +11,23 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import org.jboss.arquillian.junit.Arquillian;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import static org.junit.Assert.*;
 
 /**
  *
  * @author matej
  */
+@RunWith(Arquillian.class)
 public class DbClientTests {
 
+	//@Inject I have to create dbClient with not default parameters. In the future, use Alternative or producer method???
     private DbClient dbClient;
     private int mongoPort = 27017;
     private String mongoUrl = "localhost";
@@ -31,18 +35,19 @@ public class DbClientTests {
     private String collectionName = "test";
     private ArrayList<Email> insertedEmails;
 
+    // i am not using injection
+   /* @Deployment
+    public static JavaArchive createDeployment() {
+        return ShrinkWrap.create(JavaArchive.class)
+            .addClass(DbClient.class)
+            .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+    }*/
+    
     public DbClientTests() throws UnknownHostException, IOException {
         dbClient = new DbClient(mongoUrl, databaseName, mongoPort, collectionName);
         dbClient.dropTable();
     }
-
-    @BeforeClass
-    public static void setUpClass() throws UnknownHostException, IOException {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
+    
 
     @Before
     public void setUp() throws IOException {

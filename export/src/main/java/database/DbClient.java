@@ -31,7 +31,7 @@ import org.bson.types.ObjectId;
  *
  * @author matej
  */
-@ApplicationScoped
+
 @Singleton
 public class DbClient {
     private static String DATABASE_PROPERTIES_FILE_NAME = "database.properties";
