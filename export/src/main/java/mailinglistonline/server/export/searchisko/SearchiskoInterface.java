@@ -1,7 +1,4 @@
 package mailinglistonline.server.export.searchisko;
-
-
-
 import java.util.Map;
 
 import javax.ws.rs.DELETE;
