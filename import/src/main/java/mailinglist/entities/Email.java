@@ -62,6 +62,15 @@ public class Email extends BasicDBObject{
         list.add(replyId);
     }
     
+    public void removeReply(String replyId) {
+        ArrayList<String> list = (ArrayList<String>)get(REPLIES_MONGO_TAG);
+        if(list == null) {
+            put(REPLIES_MONGO_TAG,new ArrayList());
+            list = (ArrayList<String>)get(REPLIES_MONGO_TAG);
+        }
+        list.remove(replyId);
+    }
+    
     public List<String> getReplies() {
        return (ArrayList<String>)get(REPLIES_MONGO_TAG);
     }

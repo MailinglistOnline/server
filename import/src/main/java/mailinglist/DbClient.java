@@ -86,6 +86,16 @@ public class DbClient {
         }
          return true;
         }
+    public boolean deleteMessage(Email email) throws IOException {
+        coll.remove(email);
+        if ( email.getInReplyTo() != null && !email.getInReplyTo().startsWith("not found email")) {
+
+            Email parent =(Email)coll.findOne(new ObjectId(email.getInReplyTo()));
+            parent.removeReply(email.getId());
+            coll.save(parent);
+        }
+         return true;
+        }
        
     public DBCollection getColl() {
         return coll;

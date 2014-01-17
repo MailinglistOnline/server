@@ -5,6 +5,7 @@
 package mailinglist;
 
 import exceptions.MalformedMessageException;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,12 +16,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.mail.Address;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+
+import searchisko.SearchManager;
 import mailinglist.entities.ContentPart;
 import mailinglist.entities.Email;
 
@@ -31,12 +35,13 @@ import mailinglist.entities.Email;
 public class MessageManager {
 
     private DbClient dbClient;
+    private SearchManager searchManager;
     private final ArrayList<String> mailingLists;
     private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "mailinglists.properties";
 
     public MessageManager(DbClient dbClient) throws IOException {
         this.dbClient = dbClient;
-
+        searchManager = new SearchManager();
         mailingLists = new ArrayList<String>();
         Properties prop = new Properties();
         prop.load(DbClient.class.getClassLoader().getResourceAsStream((MAILINGLISTS_PROPERTIES_FILE_NAME)));
@@ -113,7 +118,6 @@ public class MessageManager {
     }
 
     private String extractEmailAddress(String address) {
-
         Pattern emailPattern = Pattern.compile("\\S+@\\S+");
         Matcher matcher = emailPattern.matcher(address);
         if (matcher.find()) {
@@ -128,7 +132,13 @@ public class MessageManager {
     }
 
     public boolean saveMessage(Email message) throws MessagingException, IOException {
-        return dbClient.saveMessage(message);
+    	if (searchManager.addEmail(message) &&  dbClient.saveMessage(message))  {
+    		return true;
+    	} else {
+    		searchManager.removeEmail(message.getId());
+    		dbClient.deleteMessage(message);
+    		return false;
+    	}
     }
 
     private Map<String, List<ContentPart>> getContentParts(Part p, boolean mainPartFound) throws
