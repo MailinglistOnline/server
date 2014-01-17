@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package database;
+package mailinglistonline.server.export.database;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -11,8 +11,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
-import database.entities.ContentPart;
-import database.entities.Email;
+
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -23,8 +22,11 @@ import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
 import javax.ejb.Stateless;
 import javax.faces.bean.ApplicationScoped;
-
 import javax.mail.MessagingException;
+
+import mailinglistonline.server.export.database.entities.ContentPart;
+import mailinglistonline.server.export.database.entities.Email;
+
 import org.bson.types.ObjectId;
 
 /**

@@ -1,5 +1,5 @@
+package mailinglistonline.server.export;
 
-import database.DbClient;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -11,6 +11,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
+
+import mailinglistonline.server.export.database.DbClient;
+
 import org.jboss.resteasy.annotations.providers.jaxb.Wrapped;
 
 /*

@@ -1,15 +1,14 @@
+package mailinglistonline.server.export;
     
-import database.DbClient;
-import database.entities.Email;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.enterprise.context.ApplicationScoped;
 import javax.faces.bean.RequestScoped;
-
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -17,6 +16,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+
+import mailinglistonline.server.export.database.DbClient;
+import mailinglistonline.server.export.database.entities.Email;
+
 import org.jboss.resteasy.annotations.providers.jaxb.Wrapped;
 
 

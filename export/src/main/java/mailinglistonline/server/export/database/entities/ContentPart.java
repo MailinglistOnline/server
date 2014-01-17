@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package database.entities;
+package mailinglistonline.server.export.database.entities;
 
 import com.mongodb.BasicDBObject;
 import javax.xml.bind.annotation.XmlElement;

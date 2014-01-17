@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package database.entities;
+package mailinglistonline.server.export.database.entities;
 
 import com.mongodb.BasicDBObject;
 import java.util.ArrayList;
@@ -44,6 +44,11 @@ public class Email extends BasicDBObject{
     @XmlElement(name="id")
     public String getId() {
         return getString(ID_MONGO_TAG);
+        
+    }
+
+    public void setId(String id) {
+    	put(ID_MONGO_TAG, id);
         
     }
     @XmlElement(name="root")

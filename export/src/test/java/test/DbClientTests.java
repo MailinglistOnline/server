@@ -4,13 +4,13 @@
  */
 package test;
 
-import database.DbClient;
-import database.entities.Email;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import mailinglistonline.server.export.database.DbClient;
+import mailinglistonline.server.export.database.entities.Email;
 
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.After;
