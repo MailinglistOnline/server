@@ -147,14 +147,12 @@ public class EmailResource {
     }
     
     // NOW COMES SEARCH  METHODS:
-    
     @GET
-    @Path("/search/content/")
+    @Path("/search/content")
     @Produces("application/xml")
     @Wrapped(element="emails")
-    public List<Email> searchEmailContent(@QueryParam("content") String content) {
-        List<Email> list=dbClient.searchByContent(content);
-        return list;
+    public List<Email> searchEmailByContent(@QueryParam("content") String content) {
+    	return dbClient.searchByContent(content);
     }
     
     

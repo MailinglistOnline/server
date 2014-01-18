@@ -26,7 +26,7 @@ public class SearchManager {
 	        emailClient = ProxyFactory.create(SearchiskoInterface.class, searchiskoUrl);
 		}
 		
-		public SearchiskoResponse searchEmail(String mainContent) {
+		public SearchiskoResponse searchEmailByContent(String mainContent) {
 			SearchiskoResponse response= new SearchiskoResponse();
 			Map<String, Object> map =emailClient.searchEmailByContent(mainContent);
 			Map<String, Map<String, Object>> emails=(Map<String, Map<String, Object>>) map.get("hits");
@@ -35,6 +35,7 @@ public class SearchManager {
 				email.setId((String)jsonEmail.get("_id"));
 				Map<String, Object> jsonFields = (Map<String, Object>)jsonEmail.get("fields");
 				email.setSubject((String)jsonFields.get("subject"));
+				response.addEmail(email);
 				//TODO: make it better, mainContent etc...
 			}
 			return response;

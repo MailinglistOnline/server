@@ -26,6 +26,8 @@ import javax.mail.MessagingException;
 
 import mailinglistonline.server.export.database.entities.ContentPart;
 import mailinglistonline.server.export.database.entities.Email;
+import mailinglistonline.server.export.searchisko.SearchManager;
+import mailinglistonline.server.export.searchisko.SearchiskoResponse;
 
 import org.bson.types.ObjectId;
 
@@ -41,10 +43,12 @@ public class DbClient {
 
     List<String> mailingLists = new ArrayList<String>();
     DBCollection coll;
+    SearchManager searchManager;
     MongoClient mongoClient;
 
     public DbClient() throws UnknownHostException, IOException {
         Properties prop = new Properties();
+        searchManager = new SearchManager();
         prop.load(DbClient.class.getClassLoader().getResourceAsStream((DATABASE_PROPERTIES_FILE_NAME)));
         Integer defaultPort = Integer.valueOf(prop.getProperty("defaultMongoPort"));
         String databaseUrl = prop.getProperty("defaultMongoUrl");
@@ -258,14 +262,12 @@ public class DbClient {
 	}
     
 
-    // TODO: implement the methods
+    
 
     public List<Email> searchByContent(String content) {
-//         BasicDBObject textSearchCommand = new BasicDBObject();
-//        textSearchCommand.put("text", collectionName);
-//        textSearchCommand.put("search", textToSearchFor);
-//        final CommandResult commandResult = db.command(textSearchCommand);
-        return null;
+    	// TODO: only geting emails back, no other searchisko things are returned
+        SearchiskoResponse response =searchManager.searchEmailByContent(content);
+        return response.getEmails();
     }
 
 	public List<Email> getEmailsFromAddress(String from) {
