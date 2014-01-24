@@ -2,6 +2,7 @@ package searchisko;
 
 import java.util.List;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -25,8 +26,8 @@ public interface SearchiskoInterface {
 		
 		@POST
 	    @Path("/content/mailing_list_message/{sys_content_id}")
-	    @Produces("application/json")
-	    public boolean sendEmail(@PathParam("sys_content_id") String id, Email email);
+		@Consumes("application/json")
+	    public boolean sendEmail(Email email, @PathParam("sys_content_id") String id);
 		
 		@DELETE
 	    @Path("/content/mailing_list_message/{sys_content_id}")

@@ -132,7 +132,7 @@ public class MessageManager {
     }
 
     public boolean saveMessage(Email message) throws MessagingException, IOException {
-    	if (searchManager.addEmail(message) &&  dbClient.saveMessage(message))  {
+    	if (dbClient.saveMessage(message) && searchManager.addEmail(message))  {
     		return true;
     	} else {
     		searchManager.removeEmail(message.getId());
