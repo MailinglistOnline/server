@@ -19,19 +19,19 @@ import mailinglist.entities.Email;
 public interface SearchiskoInterface {
 
 		@GET
-	    @Path("/content/mailing_list_message/{sys_content_id}")
+	    @Path("/content/mlonline_email/{sys_content_id}")
 	    @Produces("application/json")
 	    public Email getEmailById(@PathParam("sys_content_id") String id);
 	    
 		
 		@POST
-	    @Path("/content/mailing_list_message/{sys_content_id}")
+	    @Path("/content/mlonline_email/{sys_content_id}")
 		@Consumes("application/json")
-	    public boolean sendEmail(Email email, @PathParam("sys_content_id") String id);
+	    public void sendEmail(Email email, @PathParam("sys_content_id") String id);
 		
 		@DELETE
-	    @Path("/content/mailing_list_message/{sys_content_id}")
+	    @Path("/content/mlonline_email/{sys_content_id}")
 	    @Produces("application/json")
-	    public boolean deleteEmail(@PathParam("sys_content_id") String id, @QueryParam("ignore_missing") boolean ignoreMissing);
+	    public void deleteEmail(@PathParam("sys_content_id") String id, @QueryParam("ignore_missing") boolean ignoreMissing);
 	    
 }
