@@ -1,6 +1,7 @@
 package mailinglistonline.server.export.searchisko;
 import java.util.Map;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -22,13 +23,13 @@ public interface SearchiskoInterface {
 		
 		@POST
 	    @Path("/content/mailing_list_message/{sys_content_id}")
-	    @Produces("application/json")
-	    public boolean sendEmail(@PathParam("sys_content_id") String id, Email email);
+		@Consumes("application/json")
+	    public void sendEmail(@PathParam("sys_content_id") String id, Email email);
 		
 		@DELETE
 	    @Path("/content/mailing_list_message/{sys_content_id}")
 	    @Produces("application/json")
-	    public boolean deleteEmail(@PathParam("sys_content_id") String id, @QueryParam("ignore_missing") boolean ignoreMissing);
+	    public void deleteEmail(@PathParam("sys_content_id") String id, @QueryParam("ignore_missing") boolean ignoreMissing);
 		
 		@GET
 	    @Path("/search")
