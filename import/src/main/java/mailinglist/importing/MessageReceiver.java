@@ -25,12 +25,14 @@ public class MessageReceiver {
         System.out.println("Message ID: " + message.getMessageID());
         System.out.println("Message content: " + message.getContent().toString());
         DbClient messageSaver;
-        if(args.length == 4) {
+        boolean sendMessageAlsoToSearchisko = true;
+        if(args.length == 5) {
             messageSaver= new DbClient(args[0], args[1], Integer.valueOf(args[2]), args[3]);
+            sendMessageAlsoToSearchisko=Boolean.valueOf(args[4]);
         } else {
             messageSaver = new DbClient();
         }
-        MessageManager manager= new MessageManager(messageSaver);
+        MessageManager manager= new MessageManager(messageSaver,sendMessageAlsoToSearchisko);
         manager.createAndSaveMessage(message);
         //messageSaver.closeConnection();
     }

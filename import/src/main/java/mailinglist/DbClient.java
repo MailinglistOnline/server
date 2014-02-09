@@ -11,13 +11,17 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
+
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+
 import mailinglist.entities.ContentPart;
 import mailinglist.entities.Email;
+import mailinglist.entities.MiniEmail;
+
 import org.bson.types.ObjectId;
 
 /**
@@ -52,13 +56,22 @@ public class DbClient {
     }
 
     private void connect(String mongoUrl, String databaseName, int mongoPort, String collectionName) throws UnknownHostException {
-       
-        mongoClient = new MongoClient(mongoUrl, mongoPort);
+    	mongoClient = new MongoClient(mongoUrl, mongoPort);
         DB db = mongoClient.getDB(databaseName);
-
         mongoClient.setWriteConcern(WriteConcern.SAFE);
         coll = db.getCollection(collectionName);
-        coll.setObjectClass(Email.class);
+         coll.setObjectClass(Email.class);
+         coll.setInternalClass(Email.IN_REPLY_TO_MONGO_TAG, MiniEmail.class);
+         coll.setInternalClass(Email.ROOT_MONGO_TAG, MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".0", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".1", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".2", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".3", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".4", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".5", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".6", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".7", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".8", MiniEmail.class);
         coll.setInternalClass(Email.MAIN_CONTENT_MONGO_TAG+ ".0", ContentPart.class);
         coll.setInternalClass(Email.MAIN_CONTENT_MONGO_TAG+ ".1", ContentPart.class);
         coll.setInternalClass(Email.MAIN_CONTENT_MONGO_TAG+ ".2", ContentPart.class);
@@ -74,24 +87,22 @@ public class DbClient {
 
     public boolean saveMessage(Email email) throws IOException {
 
-        if (getId(email.getMessageId(), email.getMessageMailingLists()) != null) {
+        if (getId(email.getMessageId(), email.getMessageMailingList()) != null) {
             return false;
         } 
         coll.insert(email);
-        if ( email.getInReplyTo() != null && !email.getInReplyTo().startsWith("not found email")) {
-
-            Email parent =(Email)coll.findOne(new ObjectId(email.getInReplyTo()));
-            parent.addReply(email.getId());
+        if ( email.getInReplyTo() != null && email.getInReplyTo().getId()!=null) {
+            Email parent =(Email)coll.findOne(new ObjectId(email.getInReplyTo().getId()));
+            parent.addReply(email);
             coll.save(parent);
         }
          return true;
         }
     public boolean deleteMessage(Email email) throws IOException {
         coll.remove(email);
-        if ( email.getInReplyTo() != null && !email.getInReplyTo().startsWith("not found email")) {
-
-            Email parent =(Email)coll.findOne(new ObjectId(email.getInReplyTo()));
-            parent.removeReply(email.getId());
+        if ( email.getInReplyTo() != null && email.getInReplyTo() !=null) {
+            Email parent =(Email)coll.findOne(new ObjectId(email.getInReplyTo().getId()));
+            parent.removeReply(email);
             coll.save(parent);
         }
          return true;
@@ -101,8 +112,8 @@ public class DbClient {
         return coll;
     }
     
-    public BasicDBObject getMessage(String mongoId) {
-        return (BasicDBObject) coll.findOne(new BasicDBObject("_id",new ObjectId(mongoId)));
+    public MiniEmail getMessage(String mongoId) {
+        return (MiniEmail) coll.findOne(new BasicDBObject("_id",new ObjectId(mongoId)));
     }
 
 
@@ -135,15 +146,24 @@ public class DbClient {
         return objects;
     }
     
+    
+    public String getId(String messageId, List<String> mailinglists) {
+    	for(String mailinglist : mailinglists) {
+    		String id =getId(messageId,mailinglist);
+    		if (id !=null) {
+    			return id;
+    		}
+    	}
+    	return null;
+    }
+    
     /*
-     * Returns the ID of the object, which has the given message_ID and has at least
-     * one common mailinglist with the list given.
+     * Returns the ID of the object, which has the given message_ID and is in the same mailinglist
      */
 
-    public String getId(String messageId, ArrayList<String> mailinglist) {
+    public String getId(String messageId, String mailinglist) {
         BasicDBObject emailObject = new BasicDBObject(Email.MESSAGE_ID_MONGO_TAG, messageId);
-        BasicDBObject mailinglistQuery = new BasicDBObject("$in",mailinglist);
-        emailObject.put(Email.MAILINGLIST_MONGO_TAG, mailinglistQuery);
+        emailObject.put(Email.MAILINGLIST_MONGO_TAG, mailinglist);
         BasicDBObject findOne = (BasicDBObject) coll.findOne(emailObject);
         if (findOne == null) {
             return null;

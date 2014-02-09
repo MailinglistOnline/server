@@ -4,10 +4,11 @@
  */
 package mailinglist.entities;
 
-import com.mongodb.BasicDBObject;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+
+import com.mongodb.BasicDBObject;
+
 
 
 
@@ -15,18 +16,13 @@ import java.util.List;
  *
  * @author matej
  */
-public class Email extends BasicDBObject{
 
-    public static final String ID_MONGO_TAG = "_id";
+public class Email extends MiniEmail{
+
     public static final String ROOT_MONGO_TAG = "root";
     public static final String IN_REPLY_TO_MONGO_TAG = "in-reply-to";
     public static final String REPLIES_MONGO_TAG = "replies";
     public static final String ATTACHMENTS_MONGO_TAG = "attachments";
-    public static final String MAILINGLIST_MONGO_TAG = "mailinglist";
-    public static final String MESSAGE_ID_MONGO_TAG = "message_id";
-    public static final String SUBJECT_MONGO_TAG = "subject";
-    public static final String DATE_MONGO_TAG = "date";
-    public static final String FROM_MONGO_TAG = "from";
     public static final String MAIN_CONTENT_MONGO_TAG = "mainContent";
     
     
@@ -35,52 +31,41 @@ public class Email extends BasicDBObject{
         put(REPLIES_MONGO_TAG,new ArrayList());
     }
     
-    public String getId() {
-        return getString(ID_MONGO_TAG);
-        
+    public MiniEmail getRoot() {
+        return (MiniEmail)get(ROOT_MONGO_TAG);
     }
 
-    public String getRoot() {
-        return getString(ROOT_MONGO_TAG);
+    public void setRoot(MiniEmail root) {
+    	put(ROOT_MONGO_TAG, new MiniEmail(root));
     }
 
-    public void setRoot(String root) {
-        put(ROOT_MONGO_TAG, root);
+    public MiniEmail getInReplyTo() {
+        return (MiniEmail) get(IN_REPLY_TO_MONGO_TAG);
+    }
+    
+    public void setInReplyTo(MiniEmail inReplyTo) {
+        put(IN_REPLY_TO_MONGO_TAG, new MiniEmail(inReplyTo));
     }
 
-
-    public String getInReplyTo() {
-        return getString(IN_REPLY_TO_MONGO_TAG);
-    }
     
-    public void addReply(String replyId) {
-        ArrayList<String> list = (ArrayList<String>)get(REPLIES_MONGO_TAG);
-        if(list == null) {
-            put(REPLIES_MONGO_TAG,new ArrayList());
-            list = (ArrayList<String>)get(REPLIES_MONGO_TAG);
-        }
-        list.add(replyId);
-    }
     
-    public void removeReply(String replyId) {
-        ArrayList<String> list = (ArrayList<String>)get(REPLIES_MONGO_TAG);
-        if(list == null) {
-            put(REPLIES_MONGO_TAG,new ArrayList());
-            list = (ArrayList<String>)get(REPLIES_MONGO_TAG);
-        }
-        list.remove(replyId);
-    }
-    
-    public List<String> getReplies() {
-       return (ArrayList<String>)get(REPLIES_MONGO_TAG);
-    }
-    
-    public void setReplies(List<String> replies) {
+    public void setReplies(List<MiniEmail> replies) {
        put(REPLIES_MONGO_TAG,replies);
     }
 
-    public void setInReplyTo(String inReplyTo) {
-        put(IN_REPLY_TO_MONGO_TAG, inReplyTo);
+
+
+    public void addReply(MiniEmail reply) {
+        ArrayList<MiniEmail> list = (ArrayList<MiniEmail>)get(REPLIES_MONGO_TAG);
+        if(list == null) {
+            put(REPLIES_MONGO_TAG,new ArrayList());
+            list = (ArrayList<MiniEmail>)get(REPLIES_MONGO_TAG);
+        }
+        list.add(new MiniEmail(reply));
+    }
+    
+    public List<MiniEmail> getReplies() {
+       return (ArrayList<MiniEmail>)get(REPLIES_MONGO_TAG);
     }
 
     public void addAttachment(ContentPart part) {
@@ -91,74 +76,37 @@ public class Email extends BasicDBObject{
         }
         list.add(part);
     }
-
-    public void addMailingList(String mailinglist) {
-        ArrayList<String>list = (ArrayList<String>)get(MAILINGLIST_MONGO_TAG);
-        if(list == null) {
-            append(MAILINGLIST_MONGO_TAG,new ArrayList<String>());
-            list = (ArrayList<String>)get(MAILINGLIST_MONGO_TAG);
-        }
-        list.add(mailinglist);
+    public void setAttachments(List<ContentPart> attachments) {
+        put(ATTACHMENTS_MONGO_TAG,attachments);
     }
 
-    public String getMessageId() {
-        return getString(MESSAGE_ID_MONGO_TAG);
-    }
-
-    public void setMessageId(String messageId) {
-        put(MESSAGE_ID_MONGO_TAG, messageId);
-    }
-
-    public String getSubject() {
-        return getString(SUBJECT_MONGO_TAG);
-    }
-
-    public void setSubject(String subject) {
-         put(SUBJECT_MONGO_TAG, subject);
-    }
-
-    public Date getSentDate() {
-        return getDate(DATE_MONGO_TAG);
-    }
-
-    public void setSentDate(Date sentDate) {
-         put(DATE_MONGO_TAG, sentDate);
-    }
-
-    public ArrayList<String> getMessageMailingLists() {
-       ArrayList<String> list = (ArrayList<String>)get(MAILINGLIST_MONGO_TAG);
-       return list;
-       
-    }
-
-    public String getFrom() {
-        return getString(FROM_MONGO_TAG);
-    }
-
-    public void setFrom(String from) {
-         put(FROM_MONGO_TAG, from);
-    }
-
-
-    public List<ContentPart> getMainContent() {
+    public ArrayList<ContentPart> getMainContent() {
         ArrayList<ContentPart> list = (ArrayList<ContentPart>)get(MAIN_CONTENT_MONGO_TAG);
         return list;
     }
 
     public void setMainContent(List<ContentPart> mainContent) {
-         put(MAIN_CONTENT_MONGO_TAG, mainContent);
+    	String mainText = mainContent.get(0).getContent();
+    	String snippet =mainText.substring(0, Math.min(mainText.length(), 150));
+        put(MAIN_CONTENT_MONGO_TAG, mainContent);
+        put(MESSAGE_SNIPPET_MONGO_TAG, snippet);
     }
-
+    
     public ArrayList<ContentPart> getAttachments() {
-        ArrayList<ContentPart> list = (ArrayList<ContentPart>)get(ATTACHMENTS_MONGO_TAG);
+        ArrayList<ContentPart> list =(ArrayList<ContentPart>) get(ATTACHMENTS_MONGO_TAG);
         return list;
     }
 
-    public void setAttachments(List<ContentPart> attachments) {
-        put(ATTACHMENTS_MONGO_TAG,attachments);
-    }
-
+	public void removeReply(MiniEmail email) {
+		 ArrayList<ContentPart> list = (ArrayList<ContentPart>)get(REPLIES_MONGO_TAG);
+	        if(list == null) {
+	            put(REPLIES_MONGO_TAG,new ArrayList());
+	            list = (ArrayList<ContentPart>)get(REPLIES_MONGO_TAG);
+	        }
+	        list.remove(email);
+		
+	}
     
-
-
 }
+
+

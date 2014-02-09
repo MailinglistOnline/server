@@ -28,13 +28,14 @@ import net.fortuna.mstor.MStorFolder;
 public class MboxImporter {
 
     private DbClient messageSaver;
+	private boolean saveAlsoToSearchisko;
 
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws NoSuchProviderException, MessagingException, IOException {
         DbClient msgSaver = new DbClient();
-        MboxImporter mbox = new MboxImporter(msgSaver);
+        MboxImporter mbox = new MboxImporter(msgSaver,true);
 
 
         if (args.length == 1) {
@@ -52,8 +53,9 @@ public class MboxImporter {
 
     }
 
-    public MboxImporter(DbClient msgSaver) throws UnknownHostException {
-        messageSaver = msgSaver;
+    public MboxImporter(DbClient msgSaver, boolean saveAlsoToSearchisko) throws UnknownHostException {
+        this.saveAlsoToSearchisko=saveAlsoToSearchisko;
+    	messageSaver = msgSaver;
     }
 
     public void importMboxDirectory(String directoryPath) throws NoSuchProviderException, IOException, MessagingException {
@@ -63,7 +65,7 @@ public class MboxImporter {
         Properties props = new Properties();
         props.setProperty("mstor.mbox.metadataStrategy", "none");
         Session session = Session.getDefaultInstance(props);
-        MessageManager manager = new MessageManager(messageSaver);
+        MessageManager manager = new MessageManager(messageSaver,saveAlsoToSearchisko);
         Store store = session.getStore(new URLName("mstor:" + mboxDirectory));
         store.connect();
         for (File file : subfiles) {
@@ -95,7 +97,7 @@ public class MboxImporter {
         inbox.open(Folder.READ_ONLY);
         Message[] messages = inbox.getMessages();
         System.out.println("Importing" + messages.length + "messages.");
-        MessageManager manager = new MessageManager(messageSaver);
+        MessageManager manager = new MessageManager(messageSaver,saveAlsoToSearchisko);
         for (Message m : messages) {
                 manager.createAndSaveMessage((MimeMessage) m);
         }

@@ -4,6 +4,7 @@
  */
 package mailinglist;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import exceptions.MalformedMessageException;
 
 import java.io.IOException;
@@ -23,22 +24,31 @@ import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.swing.event.ListSelectionEvent;
+
+import org.apache.commons.collections.set.CompositeSet.SetMutator;
 
 import searchisko.SearchManager;
 import mailinglist.entities.ContentPart;
 import mailinglist.entities.Email;
+import mailinglist.entities.MiniEmail;
 
 /**
  *
- * @author matej
+ * @author Matej Briškár
  */
 public class MessageManager {
 
     private DbClient dbClient;
     private SearchManager searchManager;
     private final ArrayList<String> mailingLists;
+	private boolean sendMessagesToSearchisko=true;
     private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "mailinglists.properties";
 
+    public MessageManager(DbClient dbClient, boolean sendMessagesToSearchisko) throws IOException {
+    	this(dbClient);
+    	this.sendMessagesToSearchisko=sendMessagesToSearchisko;
+    }
     public MessageManager(DbClient dbClient) throws IOException {
         this.dbClient = dbClient;
         searchManager = new SearchManager();
@@ -58,7 +68,10 @@ public class MessageManager {
         // automaticly detect new mailinglists or not?
     }
 
-    public Email createMessage(MimeMessage message) throws MessagingException, IOException, MalformedMessageException {
+    /*
+     * List of emails can be returned if there are more found mailinglists
+     */
+    public List<Email> createMessage(MimeMessage message) throws MessagingException, IOException, MalformedMessageException {
         if (message.getMessageID() == null && message.getFrom() == null) {
             throw new MalformedMessageException();
         }
@@ -76,45 +89,49 @@ public class MessageManager {
         }
         Address[] addresses = message.getAllRecipients();
         List<String> stringAddresses = new ArrayList<String>();
-        
+        List<String> mailingListAddresses = new ArrayList<String>();
         for (Address ad : addresses) {
             InternetAddress iad = (InternetAddress) ad;
             stringAddresses.add(iad.getAddress());
             if (mailingLists.contains(iad.getAddress().toLowerCase())) {
-                email.addMailingList(iad.getAddress().toLowerCase());
+            	mailingListAddresses.add(iad.getAddress().toLowerCase());
             }
         }
-        if ( email.getMessageMailingLists()==null) {
+        if (mailingListAddresses.isEmpty()) {
             System.out.println("Not found mailinglist in addresses :" + stringAddresses);
             System.out.println("Email with messageId " + email.getMessageId() + " was not registered");
             return null;
         }
-
-        if (message.getHeader("In-Reply-To") != null) {
-            String inReplyTo = dbClient.getId(message.getHeader("In-Reply-To")[0], email.getMessageMailingLists());
-            if(inReplyTo != null) {
-                email.setInReplyTo(inReplyTo);
-            } else {
-                email.setInReplyTo("not found email for (" + message.getHeader("In-Reply-To")[0] + ")" );
-            }
-            
+       
+        // now create a clone of the email for each mailinglist
+        List<Email> emails = new ArrayList<Email>();
+        for (String mailinglist: mailingListAddresses) {
+        	Email clone = (Email) email.clone();
+        	//mailinglist-specific data setters
+        	clone.setMailingList(mailinglist);
+        	if (message.getHeader("In-Reply-To") != null) {
+        		setInReplyTo(clone, message.getHeader("In-Reply-To")[0],Collections.singletonList(clone.getMessageMailingList()));
+        	}
+        	setRoot(clone);
+        	emails.add(clone);
         }
-        //setRoot
+        return emails;
 
-        if (email.getInReplyTo() != null && !email.getInReplyTo().startsWith("not found email for")) {
-            Email parent =(Email) dbClient.getMessage(email.getInReplyTo());
-            
-            if ("true".equals(parent.getRoot())) {
+    }
+    
+    private void setRoot(Email email) {
+    	if (email.getInReplyTo() != null && email.getInReplyTo().getId() != null) {
+            Email parent =(Email) dbClient.getMessage(email.getInReplyTo().getId());
+            if (parent.getRoot().getId() == null) {
                 email.setRoot(email.getInReplyTo());
             } else {
                 email.setRoot(parent.getRoot());
             }
         } else {
-            email.setRoot("true");
+        	// if it is a root email, it does not point to another email
+            email.setRoot(new MiniEmail());
         }
-
-        return email;
-
+        
     }
 
     private String extractEmailAddress(String address) {
@@ -130,9 +147,23 @@ public class MessageManager {
         return null;
 
     }
+    
+    private void setInReplyTo(Email email, String inReplyToMessageID,List<String> mailingListAddresses) {
+    	String inReplyToID = dbClient.getId(inReplyToMessageID, mailingListAddresses);
+        if(inReplyToID != null) {
+            email.setInReplyTo(dbClient.getMessage(inReplyToID));
+        } else {
+        	//TODO: for now pushing empty email so it will be visible 
+        	//that an error (not found email) occured. Feel free to switch to null after some time.
+            email.setInReplyTo(new MiniEmail());
+        }
+    }
 
     public boolean saveMessage(Email message) throws MessagingException, IOException {
     	if (dbClient.saveMessage(message)) {
+    		if(!sendMessagesToSearchisko) {
+    			return true;
+    		}
     		if ( searchManager.addEmail(message)) {
     			return true;
     		} else {
@@ -227,9 +258,11 @@ public class MessageManager {
 
     public boolean createAndSaveMessage(MimeMessage mimeMessage) {
         try {
-            Email message = createMessage(mimeMessage);
-            if (message != null) {
-                saveMessage(message);
+            List<Email> messages = createMessage(mimeMessage);
+            if (messages != null && !messages.isEmpty()) {
+            	for (Email message : messages) {
+            		saveMessage(message);
+            	}
             }
             return true;
         } catch (MessagingException ex) {
