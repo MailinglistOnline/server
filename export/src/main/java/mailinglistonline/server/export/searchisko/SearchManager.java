@@ -28,8 +28,9 @@ public class SearchManager {
 		
 		public SearchiskoResponse searchEmailByContent(String mainContent) {
 			SearchiskoResponse response= new SearchiskoResponse();
-			Map<String, Object> map =emailClient.searchEmailByContent(mainContent);
-			Map<String, Map<String, Object>> emails=(Map<String, Map<String, Object>>) map.get("hits");
+			Map<String, Object> map =emailClient.searchEmailByContent(mainContent, true);
+			Map<String, Object> hitsMap=(Map<String, Object>) map.get("hits");
+			Map<String, Map<String, Object>> emails=(Map<String, Map<String, Object>>) hitsMap.get("hits");
 			for(Map<String, Object> jsonEmail : emails.values()) {
 				Email email = new Email();
 				email.setId((String)jsonEmail.get("_id"));

@@ -44,7 +44,7 @@ public interface SearchiskoInterface {
 		@GET
 	    @Path("/search")
 	    @Produces("application/json")
-	    public Map<String, Object> searchEmailByContent(@QueryParam("query") String query);
+	    public Map<String, Object> searchEmailByContent(@QueryParam("query") String query, @QueryParam("query_highlight") Boolean highlight);
 	    
 	    
 }

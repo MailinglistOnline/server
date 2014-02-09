@@ -11,6 +11,7 @@ import java.util.List;
 
 import mailinglistonline.server.export.database.DbClient;
 import mailinglistonline.server.export.database.entities.Email;
+import mailinglistonline.server.export.database.entities.MiniEmail;
 
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.After;
@@ -55,7 +56,7 @@ public class DbClientTests {
         Email email1 = new Email();
         email1.setFrom("from1@from1.sk");
         email1.setMessageId("message1");
-        email1.setRoot("true");
+        email1.setRoot(new MiniEmail());
         email1.addMailingList("mailinglist1");
         dbClient.saveMessage(email1);
         insertedEmails.add(email1);

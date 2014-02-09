@@ -23,7 +23,7 @@ import org.jboss.resteasy.annotations.providers.jaxb.Wrapped;
 
 /**
  *
- * @author matej
+ * @author Matej Briškár
  */
 @ApplicationScoped
 @Path("/mailinglists")

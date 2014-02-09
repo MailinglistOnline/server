@@ -26,6 +26,7 @@ import javax.mail.MessagingException;
 
 import mailinglistonline.server.export.database.entities.ContentPart;
 import mailinglistonline.server.export.database.entities.Email;
+import mailinglistonline.server.export.database.entities.MiniEmail;
 import mailinglistonline.server.export.searchisko.SearchManager;
 import mailinglistonline.server.export.searchisko.SearchiskoResponse;
 
@@ -82,6 +83,17 @@ public class DbClient {
         mongoClient.setWriteConcern(WriteConcern.SAFE);
         coll = db.getCollection(collectionName);
          coll.setObjectClass(Email.class);
+         coll.setInternalClass(Email.IN_REPLY_TO_MONGO_TAG, MiniEmail.class);
+         coll.setInternalClass(Email.ROOT_MONGO_TAG, MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".0", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".1", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".2", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".3", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".4", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".5", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".6", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".7", MiniEmail.class);
+         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".8", MiniEmail.class);
         coll.setInternalClass(Email.MAIN_CONTENT_MONGO_TAG+ ".0", ContentPart.class);
         coll.setInternalClass(Email.MAIN_CONTENT_MONGO_TAG+ ".1", ContentPart.class);
         coll.setInternalClass(Email.MAIN_CONTENT_MONGO_TAG+ ".2", ContentPart.class);
@@ -147,21 +159,7 @@ public class DbClient {
         return emails;
     }
     
-    public boolean saveMessage(Email email) throws IOException {
-
-        if (getId(email.getMessageId(), email.getMessageMailingLists()) != null) {
-            return false;
-        } 
-        coll.insert(email);
-        if ( email.getInReplyTo() != null) {
-
-            Email parent =(Email)coll.findOne(new ObjectId(email.getInReplyTo()));
-            parent.addReply(email.getId());
-            coll.save(parent);
-        }
-         return true;
-        }
-    
+  
     public boolean updateEmail(Email newEmail) throws IOException {
 
         coll.save(newEmail);
@@ -200,7 +198,7 @@ public class DbClient {
            return replyPath;
        }
        BasicDBObject query;
-       List<String> replyIds=new ArrayList<String>();
+       List<MiniEmail> replyIds=new ArrayList<MiniEmail>();
        replyIds.addAll(email.getReplies());
        
        replyPath.add(email);
@@ -208,8 +206,8 @@ public class DbClient {
            return replyPath;
        }
        for(int i =0; i< replyIds.size();i++) {
-           String reply =replyIds.get(i);
-           query=new BasicDBObject("_id",new ObjectId(reply));
+           MiniEmail reply =replyIds.get(i);
+           query=new BasicDBObject("_id",new ObjectId(reply.getId()));
            Email replyEmail=(Email)coll.findOne(query);
            replyIds.addAll(replyEmail.getReplies());
            replyPath.add(replyEmail);
@@ -221,14 +219,15 @@ public class DbClient {
         return mailingLists;
     }
 
-    public List<Email> getEmailReplies(String id) {
+   /* Should not be needed as the MiniEmail replies are now stored inside the email
+    *  public List<Email> getEmailReplies(String id) {
         Email email = getEmailWithId(id);
         List<Email> result = new ArrayList<Email>();
         for (String replyId : email.getReplies()) {
             result.add(getEmailWithId(replyId));
         }
         return result;
-    }
+    }*/
     
     public void addTagToEmail(String emailId, String tag) {
 		Email email = getEmailWithId(emailId);

@@ -30,7 +30,7 @@ import org.jboss.resteasy.annotations.providers.jaxb.Wrapped;
 
 /**
  *
- * @author matej
+ * @author Matej Briškár
  */
 
 @RequestScoped
@@ -61,6 +61,8 @@ public class EmailResource {
 
     }
      
+    /* Should not be needed anymore because the replies are in the emails now
+     
     @GET
     @Path("/replies/id")
     @Produces("application/xml")
@@ -69,6 +71,7 @@ public class EmailResource {
          ArrayList<Email> list= new ArrayList<Email>();
          return dbClient.getEmailReplies(id);
     }
+    */
     
     @GET
     @Path("/from")
@@ -146,7 +149,7 @@ public class EmailResource {
     	dbClient.addTagToEmail(id,tag);
     }
     
-    // NOW COMES SEARCH  METHODS:
+    // NOW COMES THE SEARCH  METHODS:
     @GET
     @Path("/search/content")
     @Produces("application/xml")
