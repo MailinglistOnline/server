@@ -63,10 +63,7 @@ public class MessageManager {
             mailinglist = prop.getProperty("mailinglist." + i);
         }
     }
-    
-    public void addMailinglistToProperties(String mailinglist) {
-        // automaticly detect new mailinglists or not?
-    }
+
 
     /*
      * List of emails can be returned if there are more found mailinglists
@@ -110,16 +107,16 @@ public class MessageManager {
         	//mailinglist-specific data setters
         	clone.setMailingList(mailinglist);
         	if (message.getHeader("In-Reply-To") != null) {
-        		setInReplyTo(clone, message.getHeader("In-Reply-To")[0],Collections.singletonList(clone.getMessageMailingList()));
+        		setInReplyToFor(clone, message.getHeader("In-Reply-To")[0],Collections.singletonList(clone.getMessageMailingList()));
         	}
-        	setRoot(clone);
+        	setRootFor(clone);
         	emails.add(clone);
         }
         return emails;
 
     }
     
-    private void setRoot(Email email) {
+    private void setRootFor(Email email) {
     	if (email.getInReplyTo() != null && email.getInReplyTo().getId() != null) {
             Email parent =(Email) dbClient.getMessage(email.getInReplyTo().getId());
             if (parent.getRoot().getId() == null) {
@@ -148,7 +145,7 @@ public class MessageManager {
 
     }
     
-    private void setInReplyTo(Email email, String inReplyToMessageID,List<String> mailingListAddresses) {
+    private void setInReplyToFor(Email email, String inReplyToMessageID,List<String> mailingListAddresses) {
     	String inReplyToID = dbClient.getId(inReplyToMessageID, mailingListAddresses);
         if(inReplyToID != null) {
             email.setInReplyTo(dbClient.getMessage(inReplyToID));

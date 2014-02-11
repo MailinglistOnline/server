@@ -60,18 +60,18 @@ public class DbClient {
         DB db = mongoClient.getDB(databaseName);
         mongoClient.setWriteConcern(WriteConcern.SAFE);
         coll = db.getCollection(collectionName);
-         coll.setObjectClass(Email.class);
-         coll.setInternalClass(Email.IN_REPLY_TO_MONGO_TAG, MiniEmail.class);
-         coll.setInternalClass(Email.ROOT_MONGO_TAG, MiniEmail.class);
-         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".0", MiniEmail.class);
-         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".1", MiniEmail.class);
-         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".2", MiniEmail.class);
-         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".3", MiniEmail.class);
-         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".4", MiniEmail.class);
-         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".5", MiniEmail.class);
-         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".6", MiniEmail.class);
-         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".7", MiniEmail.class);
-         coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".8", MiniEmail.class);
+        coll.setObjectClass(Email.class);
+        coll.setInternalClass(Email.IN_REPLY_TO_MONGO_TAG, MiniEmail.class);
+        coll.setInternalClass(Email.ROOT_MONGO_TAG, MiniEmail.class);
+        coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".0", MiniEmail.class);
+        coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".1", MiniEmail.class);
+        coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".2", MiniEmail.class);
+        coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".3", MiniEmail.class);
+        coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".4", MiniEmail.class);
+        coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".5", MiniEmail.class);
+        coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".6", MiniEmail.class);
+        coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".7", MiniEmail.class);
+        coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".8", MiniEmail.class);
         coll.setInternalClass(Email.MAIN_CONTENT_MONGO_TAG+ ".0", ContentPart.class);
         coll.setInternalClass(Email.MAIN_CONTENT_MONGO_TAG+ ".1", ContentPart.class);
         coll.setInternalClass(Email.MAIN_CONTENT_MONGO_TAG+ ".2", ContentPart.class);
@@ -86,7 +86,7 @@ public class DbClient {
     }
 
     public boolean saveMessage(Email email) throws IOException {
-
+    	// check if the message is not already saved
         if (getId(email.getMessageId(), email.getMessageMailingList()) != null) {
             return false;
         } 
@@ -97,7 +97,8 @@ public class DbClient {
             coll.save(parent);
         }
          return true;
-        }
+    }
+    
     public boolean deleteMessage(Email email) throws IOException {
         coll.remove(email);
         if ( email.getInReplyTo() != null && email.getInReplyTo() !=null) {
@@ -131,6 +132,7 @@ public class DbClient {
 
     }
 
+    // should not be used anymore
     public List<Email> getAllEmails() {
         coll.setObjectClass(Email.class);
          
@@ -160,7 +162,6 @@ public class DbClient {
     /*
      * Returns the ID of the object, which has the given message_ID and is in the same mailinglist
      */
-
     public String getId(String messageId, String mailinglist) {
         BasicDBObject emailObject = new BasicDBObject(Email.MESSAGE_ID_MONGO_TAG, messageId);
         emailObject.put(Email.MAILINGLIST_MONGO_TAG, mailinglist);

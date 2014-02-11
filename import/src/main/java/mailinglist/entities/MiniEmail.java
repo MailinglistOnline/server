@@ -10,8 +10,6 @@ import com.mongodb.BasicDBObject;
 public class MiniEmail extends BasicDBObject{
 
     public static final String ID_MONGO_TAG = "_id";
-    public static final String ROOT_MONGO_TAG = "root";
-    public static final String IN_REPLY_TO_MONGO_TAG = "in-reply-to";
     public static final String MAILINGLIST_MONGO_TAG = "mailinglist";
     public static final String MESSAGE_ID_MONGO_TAG = "message_id";
     public static final String SUBJECT_MONGO_TAG = "subject";
@@ -38,7 +36,6 @@ public class MiniEmail extends BasicDBObject{
     	setFrom(email.getFrom());
     	setMessageSnippet(email.getMessageSnippet());
     	setTags(email.getTags());
-    	setMessageSnippet(email.getMessageSnippet());
     }
     
     
@@ -51,21 +48,7 @@ public class MiniEmail extends BasicDBObject{
     	put(ID_MONGO_TAG, id);
         
     }
-    public MiniEmail getRoot() {
-        return (MiniEmail)get(ROOT_MONGO_TAG);
-    }
-
-    public void setRoot(MiniEmail root) {
-        put(ROOT_MONGO_TAG, root);
-    }
-
-    public MiniEmail getInReplyTo() {
-        return (MiniEmail) get(IN_REPLY_TO_MONGO_TAG);
-    }
-    
-    public void setInReplyTo(MiniEmail inReplyTo) {
-        put(IN_REPLY_TO_MONGO_TAG, inReplyTo);
-    }
+   
 
     public void setMailingList(String mailinglist) {
     	put(MAILINGLIST_MONGO_TAG, mailinglist);

@@ -47,7 +47,6 @@ public class MboxImporter {
             }
 
         } else {
-
             System.out.println("Call the method with one parameter (mbox path)");
         }
 

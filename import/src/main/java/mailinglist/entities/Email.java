@@ -19,7 +19,8 @@ import com.mongodb.BasicDBObject;
 
 public class Email extends MiniEmail{
 
-    public static final String ROOT_MONGO_TAG = "root";
+    private static final int message_snippet_length = 150;
+	public static final String ROOT_MONGO_TAG = "root";
     public static final String IN_REPLY_TO_MONGO_TAG = "in-reply-to";
     public static final String REPLIES_MONGO_TAG = "replies";
     public static final String ATTACHMENTS_MONGO_TAG = "attachments";
@@ -87,7 +88,7 @@ public class Email extends MiniEmail{
 
     public void setMainContent(List<ContentPart> mainContent) {
     	String mainText = mainContent.get(0).getContent();
-    	String snippet =mainText.substring(0, Math.min(mainText.length(), 150));
+    	String snippet =mainText.substring(0, Math.min(mainText.length(), message_snippet_length));
         put(MAIN_CONTENT_MONGO_TAG, mainContent);
         put(MESSAGE_SNIPPET_MONGO_TAG, snippet);
     }

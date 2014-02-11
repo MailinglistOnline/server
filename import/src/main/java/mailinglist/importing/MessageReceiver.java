@@ -22,6 +22,7 @@ public class MessageReceiver {
     public static void main(String[] args) throws MessagingException, IOException {
         Session s = Session.getDefaultInstance(new Properties());
         MimeMessage message = new MimeMessage(s, System.in);
+        System.out.println("Message received through the terminal");
         System.out.println("Message ID: " + message.getMessageID());
         System.out.println("Message content: " + message.getContent().toString());
         DbClient messageSaver;
@@ -34,6 +35,6 @@ public class MessageReceiver {
         }
         MessageManager manager= new MessageManager(messageSaver,sendMessageAlsoToSearchisko);
         manager.createAndSaveMessage(message);
-        //messageSaver.closeConnection();
+        messageSaver.closeConnection();
     }
 }
