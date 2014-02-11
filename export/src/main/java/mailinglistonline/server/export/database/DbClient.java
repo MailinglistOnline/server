@@ -26,6 +26,7 @@ import javax.mail.MessagingException;
 
 import mailinglistonline.server.export.database.entities.ContentPart;
 import mailinglistonline.server.export.database.entities.Email;
+import mailinglistonline.server.export.database.entities.Mailinglist;
 import mailinglistonline.server.export.database.entities.MiniEmail;
 import mailinglistonline.server.export.searchisko.SearchManager;
 import mailinglistonline.server.export.searchisko.SearchiskoResponse;
@@ -42,7 +43,7 @@ public class DbClient {
     private static String DATABASE_PROPERTIES_FILE_NAME = "database.properties";
     private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "mailinglists.properties";
 
-    List<String> mailingLists = new ArrayList<String>();
+    List<Mailinglist> mailingLists = new ArrayList<Mailinglist>();
     DBCollection coll;
     SearchManager searchManager;
     MongoClient mongoClient;
@@ -66,7 +67,11 @@ public class DbClient {
         String mailinglist = prop.getProperty("mailinglist." + 1);
         int i = 1;
         while (mailinglist != null) {
-            mailingLists.add(mailinglist);
+        	Mailinglist mlist = new Mailinglist();
+        	mlist.setName(mailinglist);
+        	String description = prop.getProperty("mailinglist.description." + i);
+        	mlist.setDescription(description);
+            mailingLists.add(mlist);
             i++;
             mailinglist = prop.getProperty("mailinglist." + i);
         }
@@ -191,7 +196,7 @@ public class DbClient {
         return emails;
     }
 
-    public List<Email> getWholePathFromId(String id) {
+    public List<Email> getWholeThreadWithMessage(String id) {
        Email email= (Email) getEmailWithId(id);
        List<Email> replyPath=new ArrayList();
        if(email == null) {
@@ -215,7 +220,7 @@ public class DbClient {
        return replyPath;
     }
 
-    public List<String> getMailingLists() {
+    public List<Mailinglist> getMailingLists() {
         return mailingLists;
     }
 

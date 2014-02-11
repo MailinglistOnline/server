@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name="mailinglists")
 public class MailingListWrapper {
     /*
-     * Zakomponovat CDI a zmazat tento wrapper
+     * Zakomponovat CDI a zmazat tento wrapper.. mailinglisty su zatial String, preto je ich tazko pomenovat zatial
      */
     
     private List<String> mailinglists;

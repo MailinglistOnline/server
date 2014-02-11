@@ -113,7 +113,7 @@ public class EmailResource {
     @Produces("application/xml")
     @Wrapped(element="emails")
     public List<Email> getEmailPath(@QueryParam("id") String id) {
-        List<Email> list=dbClient.getWholePathFromId(id);
+        List<Email> list=dbClient.getWholeThreadWithMessage(id);
         return list;
          
     }

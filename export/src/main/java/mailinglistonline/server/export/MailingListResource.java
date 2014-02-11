@@ -13,6 +13,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.GenericEntity;
 
 import mailinglistonline.server.export.database.DbClient;
+import mailinglistonline.server.export.database.entities.Mailinglist;
 
 import org.jboss.resteasy.annotations.providers.jaxb.Wrapped;
 
@@ -32,20 +33,16 @@ public class MailingListResource {
     DbClient dbClient;
     
     
-    public MailingListResource() throws UnknownHostException, IOException {
+    public MailingListResource() {
     }
 
-
-    
     @GET
     @Path("/all")
     @Produces("application/xml")
     @Wrapped(element="mailinglists")
-    public MailingListWrapper getAllEmails() {
-        List<String> list =dbClient.getMailingLists();
-       MailingListWrapper wrapper= new MailingListWrapper();
-       wrapper.setMailinglists(list);
-        return wrapper;
+    public List<Mailinglist> getAllEmails() {
+        List<Mailinglist> list =dbClient.getMailingLists();
+        return list;
 
     }
     
