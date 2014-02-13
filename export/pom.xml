@@ -73,17 +73,16 @@
             <version>2.10.1</version>
         </dependency>
         <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxb-provider</artifactId>
-            <version>2.3.5.Final</version>
-            <scope>provided</scope>
-        </dependency>
+		    <groupId>org.jboss.resteasy</groupId>
+		    <artifactId>resteasy-jackson-provider</artifactId>
+		    <version>2.2.1.GA</version>
+		</dependency>
         
         <dependency>
-    <groupId>org.jboss.arquillian.junit</groupId>
-    <artifactId>arquillian-junit-container</artifactId>
-    <scope>test</scope>
-</dependency>
+   		    <groupId>org.jboss.arquillian.junit</groupId>
+  		    <artifactId>arquillian-junit-container</artifactId>
+            <scope>test</scope>
+        </dependency>
         
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -98,12 +97,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-   <groupId>org.jboss.spec</groupId>
-   <artifactId>jboss-javaee-6.0</artifactId>
-   <version>1.0.0.Final</version>
-   <type>pom</type>
-   <scope>provided</scope>
-</dependency>
+            <groupId>org.jboss.spec</groupId>
+            <artifactId>jboss-javaee-6.0</artifactId>
+            <version>1.0.0.Final</version>
+            <type>pom</type>
+            <scope>provided</scope>
+         </dependency>
         
         <dependency>
 	<groupId>org.mongodb</groupId>

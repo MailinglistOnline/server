@@ -13,18 +13,19 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
+
 /**
  *
- * @author matej
+ * @author Matej Briškár
  */
 @XmlRootElement(name = "email")
 public class Email extends MiniEmail{
 
-    public static final String ROOT_MONGO_TAG = "root";
-    public static final String IN_REPLY_TO_MONGO_TAG = "in-reply-to";
+	public static final String ROOT_MONGO_TAG = "thread_root";
+    public static final String IN_REPLY_TO_MONGO_TAG = "in_reply_to";
     public static final String REPLIES_MONGO_TAG = "replies";
     public static final String ATTACHMENTS_MONGO_TAG = "attachments";
-    public static final String MAIN_CONTENT_MONGO_TAG = "mainContent";
+    public static final String MAIN_CONTENT_MONGO_TAG = "main_content";
     
     
     public Email() {
@@ -32,7 +33,7 @@ public class Email extends MiniEmail{
         put(REPLIES_MONGO_TAG,new ArrayList());
     }
     
-    @XmlElement(name="root")
+    @XmlElement(name=ROOT_MONGO_TAG)
     public MiniEmail getRoot() {
         return (MiniEmail)get(ROOT_MONGO_TAG);
     }
@@ -41,7 +42,7 @@ public class Email extends MiniEmail{
         put(ROOT_MONGO_TAG, new MiniEmail(root));
     }
 
-    @XmlElement(name="in_reply_to")
+    @XmlElement(name=IN_REPLY_TO_MONGO_TAG)
     public MiniEmail getInReplyTo() {
         return (MiniEmail) get(IN_REPLY_TO_MONGO_TAG);
     }
@@ -67,7 +68,7 @@ public class Email extends MiniEmail{
         list.add(new MiniEmail(reply));
     }
     
-    @XmlElementWrapper(name="replies")
+    @XmlElementWrapper(name=REPLIES_MONGO_TAG)
     @XmlElement(name="reply")
     public List<MiniEmail> getReplies() {
        return (ArrayList<MiniEmail>)get(REPLIES_MONGO_TAG);
@@ -85,7 +86,7 @@ public class Email extends MiniEmail{
         put(ATTACHMENTS_MONGO_TAG,attachments);
     }
 
-    @XmlElementWrapper(name="main_content")
+    @XmlElementWrapper(name=MAIN_CONTENT_MONGO_TAG)
     @XmlElement(name="alternative")
     public ArrayList<ContentPart> getMainContent() {
         ArrayList<ContentPart> list = (ArrayList<ContentPart>)get(MAIN_CONTENT_MONGO_TAG);
@@ -96,7 +97,7 @@ public class Email extends MiniEmail{
          put(MAIN_CONTENT_MONGO_TAG, mainContent);
     }
     
-    @XmlElementWrapper(name="attachments")
+    @XmlElementWrapper(name=ATTACHMENTS_MONGO_TAG)
     @XmlElement(name="attachment")
     public ArrayList<ContentPart> getAttachments() {
         ArrayList<ContentPart> list =(ArrayList<ContentPart>) get(ATTACHMENTS_MONGO_TAG);
@@ -104,5 +105,3 @@ public class Email extends MiniEmail{
     }
     
 }
-
-

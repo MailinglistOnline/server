@@ -1,10 +1,10 @@
 package mailinglistonline.server.export.searchisko;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 import java.util.Properties;
 
-import mailinglistonline.server.export.database.entities.Email;
+import mailinglistonline.server.export.database.entities.MiniEmail;
 
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
@@ -26,23 +26,10 @@ public class SearchManager {
 	        emailClient = ProxyFactory.create(SearchiskoInterface.class, searchiskoUrl);
 		}
 		
-		public SearchiskoResponse searchEmailByContent(String mainContent) {
-			SearchiskoResponse response= new SearchiskoResponse();
-			Map<String, Object> map =emailClient.searchEmailByContent(mainContent, true);
-			Map<String, Object> hitsMap=(Map<String, Object>) map.get("hits");
-			Map<String, Map<String, Object>> emails=(Map<String, Map<String, Object>>) hitsMap.get("hits");
-			for(Map<String, Object> jsonEmail : emails.values()) {
-				Email email = new Email();
-				email.setId((String)jsonEmail.get("_id"));
-				Map<String, Object> jsonFields = (Map<String, Object>)jsonEmail.get("fields");
-				email.setSubject((String)jsonFields.get("subject"));
-				response.addEmail(email);
-				//TODO: make it better, mainContent etc...
-			}
-			return response;
-			
-			
-			
+		public List<MiniEmail> searchEmailByContent(String mainContent) {
+			SearchiskoResponseParser parser= new SearchiskoResponseParser();
+			parser.parse(emailClient.searchEmailByContent(mainContent, true));
+			return parser.getEmails();
 		}
 	
 }

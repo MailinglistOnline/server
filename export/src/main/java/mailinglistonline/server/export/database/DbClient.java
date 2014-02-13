@@ -29,7 +29,7 @@ import mailinglistonline.server.export.database.entities.Email;
 import mailinglistonline.server.export.database.entities.Mailinglist;
 import mailinglistonline.server.export.database.entities.MiniEmail;
 import mailinglistonline.server.export.searchisko.SearchManager;
-import mailinglistonline.server.export.searchisko.SearchiskoResponse;
+import mailinglistonline.server.export.searchisko.SearchiskoResponseParser;
 
 import org.bson.types.ObjectId;
 
@@ -135,10 +135,10 @@ public class DbClient {
         return (Email) coll.findOne(idObj);
     }
 
-    public List<Email> getAllEmails() {
+    public List<MiniEmail> getAllEmails() {
         coll.setObjectClass(Email.class);
         DBCursor cursor = coll.find();
-        List<Email> emails = new ArrayList<Email>();
+        List<MiniEmail> emails = new ArrayList<MiniEmail>();
         try {
             while (cursor.hasNext()) {
                 Email email = (Email) cursor.next();
@@ -154,9 +154,9 @@ public class DbClient {
         return (Email)coll.findOne(new BasicDBObject("_id", new ObjectId(id)));
     }
 
-    public List<Email> getEmailsFrom(String author) {
+    public List<MiniEmail> getEmailsFrom(String author) {
         DBCursor find = coll.find(new BasicDBObject("from",author));
-        List<Email> emails = new ArrayList<Email>();
+        List<MiniEmail> emails = new ArrayList<MiniEmail>();
         while(find.hasNext()) {
             Email next = (Email) find.next();
             emails.add(next);
@@ -183,12 +183,12 @@ public class DbClient {
         return findOne.getString("_id");
     }
 
-    public List<Email> getMailinglistRoot(String mailinglist) {
+    public List<MiniEmail> getMailinglistRoot(String mailinglist) {
         BasicDBObject query= new BasicDBObject();
         query.append(Email.ROOT_MONGO_TAG, "true");
         query.append(Email.MAILINGLIST_MONGO_TAG,mailinglist);
         DBCursor find = coll.find(query);
-        List<Email> emails = new ArrayList<Email>();
+        List<MiniEmail> emails = new ArrayList<MiniEmail>();
         while(find.hasNext()) {
             Email next = (Email) find.next();
             emails.add(next);
@@ -196,9 +196,9 @@ public class DbClient {
         return emails;
     }
 
-    public List<Email> getWholeThreadWithMessage(String id) {
+    public List<MiniEmail> getWholeThreadWithMessage(String id) {
        Email email= (Email) getEmailWithId(id);
-       List<Email> replyPath=new ArrayList();
+       List<MiniEmail> replyPath=new ArrayList();
        if(email == null) {
            return replyPath;
        }
@@ -268,10 +268,8 @@ public class DbClient {
 
     
 
-    public List<Email> searchByContent(String content) {
-    	// TODO: only geting emails back, no other searchisko things are returned
-        SearchiskoResponse response =searchManager.searchEmailByContent(content);
-        return response.getEmails();
+    public List<MiniEmail> searchByContent(String content) {
+    	return searchManager.searchEmailByContent(content);
     }
 
 	public List<Email> getEmailsFromAddress(String from) {

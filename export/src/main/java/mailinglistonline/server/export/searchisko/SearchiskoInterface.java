@@ -20,7 +20,6 @@ public interface SearchiskoInterface {
 	    @Produces("application/json")
 	    public Email getEmailById(@PathParam("sys_content_id") String id);
 	    
-		
 		@POST
 	    @Path("/content/mailing_list_message/{sys_content_id}")
 		@Consumes("application/json")

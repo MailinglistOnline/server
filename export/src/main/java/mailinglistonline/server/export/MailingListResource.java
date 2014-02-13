@@ -15,7 +15,7 @@ import javax.ws.rs.core.GenericEntity;
 import mailinglistonline.server.export.database.DbClient;
 import mailinglistonline.server.export.database.entities.Mailinglist;
 
-import org.jboss.resteasy.annotations.providers.jaxb.Wrapped;
+
 
 /*
  * To change this template, choose Tools | Templates
@@ -38,8 +38,7 @@ public class MailingListResource {
 
     @GET
     @Path("/all")
-    @Produces("application/xml")
-    @Wrapped(element="mailinglists")
+    @Produces("application/json")
     public List<Mailinglist> getAllEmails() {
         List<Mailinglist> list =dbClient.getMailingLists();
         return list;

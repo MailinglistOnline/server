@@ -5,22 +5,19 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ejb.EJB;
-import javax.ejb.Stateless;
-import javax.enterprise.context.ApplicationScoped;
 import javax.faces.bean.RequestScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import mailinglistonline.server.export.database.DbClient;
 import mailinglistonline.server.export.database.entities.Email;
+import mailinglistonline.server.export.database.entities.MiniEmail;
 
-import org.jboss.resteasy.annotations.providers.jaxb.Wrapped;
+//import org.jboss.resteasy.annotations.providers.jaxb.Wrapped;
 
 
 /*
@@ -46,16 +43,16 @@ public class EmailResource {
     
     @GET
     @Path("/all")
-    @Produces("application/xml")
-    @Wrapped(element="emails")
-    public List<Email> getAllEmails() {
+    @Produces("application/json")
+    //@Wrapped(element="emails")
+    public List<MiniEmail> getAllEmails() {
         return dbClient.getAllEmails();
     }
     
     @GET
     @Path("/email/id")
-    @Produces("application/xml")
-    @Wrapped(element="emails")
+    @Produces("application/json")
+    //@Wrapped(element="emails")
     public Email getEmailById(@QueryParam("id") String id) {
          return dbClient.getEmailWithId(id);
 
@@ -75,30 +72,30 @@ public class EmailResource {
     
     @GET
     @Path("/from")
-    @Produces("application/xml")
-    @Wrapped(element="emails")
-    public List<Email> getEmailByAuthor(@QueryParam("from") String author) {
+    @Produces("application/json")
+    //@Wrapped(element="emails")
+    public List<MiniEmail> getEmailByAuthor(@QueryParam("from") String author) {
         return dbClient.getEmailsFrom(author);
          
     }
     
     @GET
     @Path("/mailinglist/roots/all")
-    @Produces("application/xml")
-    @Wrapped(element="emails")
-    public List<Email> getMailingListRoots(@QueryParam("mailinglist") String mailinglist) {
+    @Produces("application/json")
+    //@Wrapped(element="emails")
+    public List<MiniEmail> getMailingListRoots(@QueryParam("mailinglist") String mailinglist) {
         return dbClient.getMailinglistRoot(mailinglist);
          
     }
     
     @GET
     @Path("/mailinglist/roots/")
-    @Produces("application/xml")
-    @Wrapped(element="emails")
-    public List<Email> getMailingListRoots(@QueryParam("from") int fromNumber,@QueryParam("to") int toNumber,@QueryParam("mailinglist") String mailinglist) {
-        List<Email> list=dbClient.getMailinglistRoot(mailinglist);
+    @Produces("application/json")
+    //@Wrapped(element="emails")
+    public List<MiniEmail> getMailingListRoots(@QueryParam("from") int fromNumber,@QueryParam("to") int toNumber,@QueryParam("mailinglist") String mailinglist) {
+        List<MiniEmail> list=dbClient.getMailinglistRoot(mailinglist);
         if(fromNumber > toNumber) {
-            return new ArrayList<Email>();
+            return new ArrayList<MiniEmail>();
         }
         if(toNumber>list.size()-1) {
             toNumber=list.size();
@@ -110,18 +107,18 @@ public class EmailResource {
     
     @GET
     @Path("/thread/")
-    @Produces("application/xml")
-    @Wrapped(element="emails")
-    public List<Email> getEmailPath(@QueryParam("id") String id) {
-        List<Email> list=dbClient.getWholeThreadWithMessage(id);
+    @Produces("application/json")
+    //@Wrapped(element="emails")
+    public List<MiniEmail> getEmailPath(@QueryParam("id") String id) {
+        List<MiniEmail> list=dbClient.getWholeThreadWithMessage(id);
         return list;
          
     }
     
     @GET
     @Path("/from/")
-    @Produces("application/xml")
-    @Wrapped(element="emails")
+    @Produces("application/json")
+    //@Wrapped(element="emails")
     public List<Email> getEmailsFromAddress(@QueryParam("from") String from) {
         List<Email> list=dbClient.getEmailsFromAddress(from);
         return list;
@@ -129,16 +126,8 @@ public class EmailResource {
     
     @GET
     @Path("/mailinglist/latest/")
-    @Produces("application/xml")
-    @Wrapped(element="emails")
-    public List<Email> getMailingLatest(@QueryParam("mailinglist") String mailinglist,@QueryParam("number") int number) {
-         return dbClient.getMailinglistLatest(mailinglist,number);
-    }
-    
-    @GET
-    @Path("/mailinglist/latest/")
-    @Produces("application/xml")
-    @Wrapped(element="emails")
+    @Produces("application/json")
+    //@Wrapped(element="emails")
     public List<Email> getMailinglistLatest(@QueryParam("mailinglist") String mailinglist, @QueryParam("number") int number) {
     	return dbClient.getMailinglistLatest(mailinglist, number);
     }
@@ -152,9 +141,9 @@ public class EmailResource {
     // NOW COMES THE SEARCH  METHODS:
     @GET
     @Path("/search/content")
-    @Produces("application/xml")
-    @Wrapped(element="emails")
-    public List<Email> searchEmailByContent(@QueryParam("content") String content) {
+    @Produces("application/json")
+    //@Wrapped(element="emails")
+    public List<MiniEmail> searchEmailByContent(@QueryParam("content") String content) {
     	return dbClient.searchByContent(content);
     }
     
