@@ -50,7 +50,7 @@ import com.mongodb.BasicDBObject;
  *
  * @author matej
  */
-public class ImportingTests {
+public class ImportingTest {
 
     public static final String TEST_MAILS_PATH = "src/test/java/mboxes/test-mails";
     public static final String TEST_MAILS_PATH2 ="src/test/java/mboxes/test-mails2";
@@ -62,7 +62,7 @@ public class ImportingTests {
     private String databaseName = "testdb";
     private String collectionName = "test";
 
-    public ImportingTests() throws UnknownHostException {
+    public ImportingTest() throws UnknownHostException {
         dbClient = new DbClient(mongoUrl, databaseName, mongoPort, collectionName);
     }
 

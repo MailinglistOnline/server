@@ -148,17 +148,6 @@ public class DbClient {
         return objects;
     }
     
-    
-    public String getId(String messageId, List<String> mailinglists) {
-    	for(String mailinglist : mailinglists) {
-    		String id =getId(messageId,mailinglist);
-    		if (id !=null) {
-    			return id;
-    		}
-    	}
-    	return null;
-    }
-    
     /*
      * Returns the ID of the object, which has the given message_ID and is in the same mailinglist
      */

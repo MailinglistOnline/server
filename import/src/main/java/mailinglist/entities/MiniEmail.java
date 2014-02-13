@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+
 import com.mongodb.BasicDBObject;
 
 
@@ -32,7 +34,7 @@ public class MiniEmail extends BasicDBObject{
     	setMailingList(email.getMessageMailingList());
     	setMessageId(email.getMessageId());
     	setSubject(email.getSubject());
-    	setSentDate(email.getSentDate());
+    	setDate(email.getDate());
     	setFrom(email.getFrom());
     	setMessageSnippet(email.getMessageSnippet());
     	setTags(email.getTags());
@@ -46,7 +48,6 @@ public class MiniEmail extends BasicDBObject{
 
     public void setId(String id) {
     	put(ID_MONGO_TAG, id);
-        
     }
    
 
@@ -78,11 +79,11 @@ public class MiniEmail extends BasicDBObject{
          put(SUBJECT_MONGO_TAG, subject);
     }
     
-    public Date getSentDate() {
-        return getDate(DATE_MONGO_TAG);
+    public long getDate() {
+        return getLong(DATE_MONGO_TAG);
     }
 
-    public void setSentDate(Date sentDate) {
+    public void setDate(long sentDate) {
          put(DATE_MONGO_TAG, sentDate);
     }
     

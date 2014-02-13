@@ -14,17 +14,17 @@ import com.mongodb.BasicDBObject;
 
 /**
  *
- * @author matej
+ * @author Matej Briškár
  */
 
 public class Email extends MiniEmail{
 
     private static final int message_snippet_length = 150;
-	public static final String ROOT_MONGO_TAG = "root";
-    public static final String IN_REPLY_TO_MONGO_TAG = "in-reply-to";
+	public static final String ROOT_MONGO_TAG = "thread_root";
+    public static final String IN_REPLY_TO_MONGO_TAG = "in_reply_to";
     public static final String REPLIES_MONGO_TAG = "replies";
     public static final String ATTACHMENTS_MONGO_TAG = "attachments";
-    public static final String MAIN_CONTENT_MONGO_TAG = "mainContent";
+    public static final String MAIN_CONTENT_MONGO_TAG = "main_content";
     
     
     public Email() {
@@ -37,7 +37,10 @@ public class Email extends MiniEmail{
     }
 
     public void setRoot(MiniEmail root) {
-    	put(ROOT_MONGO_TAG, new MiniEmail(root));
+    	if (root != null) {
+    		put(ROOT_MONGO_TAG, new MiniEmail(root));
+    	}
+    	
     }
 
     public MiniEmail getInReplyTo() {
@@ -45,16 +48,15 @@ public class Email extends MiniEmail{
     }
     
     public void setInReplyTo(MiniEmail inReplyTo) {
-        put(IN_REPLY_TO_MONGO_TAG, new MiniEmail(inReplyTo));
-    }
-
-    
+    	if (inReplyTo != null) {
+    		 put(IN_REPLY_TO_MONGO_TAG, new MiniEmail(inReplyTo));
+    	}
+       
+    }    
     
     public void setReplies(List<MiniEmail> replies) {
        put(REPLIES_MONGO_TAG,replies);
     }
-
-
 
     public void addReply(MiniEmail reply) {
         ArrayList<MiniEmail> list = (ArrayList<MiniEmail>)get(REPLIES_MONGO_TAG);

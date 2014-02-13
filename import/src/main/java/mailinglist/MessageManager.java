@@ -66,7 +66,8 @@ public class MessageManager {
 
 
     /*
-     * List of emails can be returned if there are more found mailinglists
+     * List of emails can be returned if there are more found mailinglists in header
+     * for the processed email
      */
     public List<Email> createMessage(MimeMessage message) throws MessagingException, IOException, MalformedMessageException {
         if (message.getMessageID() == null && message.getFrom() == null) {
@@ -74,7 +75,7 @@ public class MessageManager {
         }
         Email email = new Email();
         email.setMessageId(message.getMessageID());
-        email.setSentDate(message.getSentDate());
+        email.setDate(message.getSentDate().getTime());
 
         String fromField = extractEmailAddress(message.getFrom()[0].toString());
         email.setFrom(fromField);
@@ -107,7 +108,7 @@ public class MessageManager {
         	//mailinglist-specific data setters
         	clone.setMailingList(mailinglist);
         	if (message.getHeader("In-Reply-To") != null) {
-        		setInReplyToFor(clone, message.getHeader("In-Reply-To")[0],Collections.singletonList(clone.getMessageMailingList()));
+        		setInReplyToFor(clone, message.getHeader("In-Reply-To")[0],clone.getMessageMailingList());
         	}
         	setRootFor(clone);
         	emails.add(clone);
@@ -117,16 +118,16 @@ public class MessageManager {
     }
     
     private void setRootFor(Email email) {
-    	if (email.getInReplyTo() != null && email.getInReplyTo().getId() != null) {
+    	if (email.getInReplyTo() != null) {
             Email parent =(Email) dbClient.getMessage(email.getInReplyTo().getId());
-            if (parent.getRoot().getId() == null) {
+            if (parent.getRoot() == null) {
                 email.setRoot(email.getInReplyTo());
             } else {
                 email.setRoot(parent.getRoot());
             }
         } else {
         	// if it is a root email, it does not point to another email
-            email.setRoot(new MiniEmail());
+            email.setRoot(null);
         }
         
     }
@@ -145,14 +146,12 @@ public class MessageManager {
 
     }
     
-    private void setInReplyToFor(Email email, String inReplyToMessageID,List<String> mailingListAddresses) {
-    	String inReplyToID = dbClient.getId(inReplyToMessageID, mailingListAddresses);
+    private void setInReplyToFor(Email email, String inReplyToMessageID,String mailingListAddress) {
+    	String inReplyToID = dbClient.getId(inReplyToMessageID, mailingListAddress);
         if(inReplyToID != null) {
             email.setInReplyTo(dbClient.getMessage(inReplyToID));
         } else {
-        	//TODO: for now pushing empty email so it will be visible 
-        	//that an error (not found email) occured. Feel free to switch to null after some time.
-            email.setInReplyTo(new MiniEmail());
+            email.setInReplyTo(null);
         }
     }
 
