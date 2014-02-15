@@ -45,7 +45,7 @@ public class EmailResource {
     @Path("/all")
     @Produces("application/json")
     //@Wrapped(element="emails")
-    public List<MiniEmail> getAllEmails() {
+    public List<Email> getAllEmails() {
         return dbClient.getAllEmails();
     }
     
@@ -74,7 +74,7 @@ public class EmailResource {
     @Path("/from")
     @Produces("application/json")
     //@Wrapped(element="emails")
-    public List<MiniEmail> getEmailByAuthor(@QueryParam("from") String author) {
+    public List<Email> getEmailByAuthor(@QueryParam("from") String author) {
         return dbClient.getEmailsFrom(author);
          
     }
@@ -83,7 +83,7 @@ public class EmailResource {
     @Path("/mailinglist/roots/all")
     @Produces("application/json")
     //@Wrapped(element="emails")
-    public List<MiniEmail> getMailingListRoots(@QueryParam("mailinglist") String mailinglist) {
+    public List<Email> getMailingListRoots(@QueryParam("mailinglist") String mailinglist) {
         return dbClient.getMailinglistRoot(mailinglist);
          
     }
@@ -92,10 +92,10 @@ public class EmailResource {
     @Path("/mailinglist/roots/")
     @Produces("application/json")
     //@Wrapped(element="emails")
-    public List<MiniEmail> getMailingListRoots(@QueryParam("from") int fromNumber,@QueryParam("to") int toNumber,@QueryParam("mailinglist") String mailinglist) {
-        List<MiniEmail> list=dbClient.getMailinglistRoot(mailinglist);
+    public List<Email> getMailingListRoots(@QueryParam("from") int fromNumber,@QueryParam("to") int toNumber,@QueryParam("mailinglist") String mailinglist) {
+        List<Email> list=dbClient.getMailinglistRoot(mailinglist);
         if(fromNumber > toNumber) {
-            return new ArrayList<MiniEmail>();
+            return new ArrayList<Email>();
         }
         if(toNumber>list.size()-1) {
             toNumber=list.size();
@@ -109,8 +109,8 @@ public class EmailResource {
     @Path("/thread/")
     @Produces("application/json")
     //@Wrapped(element="emails")
-    public List<MiniEmail> getEmailPath(@QueryParam("id") String id) {
-        List<MiniEmail> list=dbClient.getWholeThreadWithMessage(id);
+    public List<Email> getEmailPath(@QueryParam("id") String id) {
+        List<Email> list=dbClient.getWholeThreadWithMessage(id);
         return list;
          
     }

@@ -42,6 +42,7 @@ import org.bson.types.ObjectId;
 public class DbClient {
     private static String DATABASE_PROPERTIES_FILE_NAME = "database.properties";
     private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "mailinglists.properties";
+    private static String MAIL_IS_ROOT=null;
 
     List<Mailinglist> mailingLists = new ArrayList<Mailinglist>();
     DBCollection coll;
@@ -135,10 +136,10 @@ public class DbClient {
         return (Email) coll.findOne(idObj);
     }
 
-    public List<MiniEmail> getAllEmails() {
+    public List<Email> getAllEmails() {
         coll.setObjectClass(Email.class);
         DBCursor cursor = coll.find();
-        List<MiniEmail> emails = new ArrayList<MiniEmail>();
+        List<Email> emails = new ArrayList<Email>();
         try {
             while (cursor.hasNext()) {
                 Email email = (Email) cursor.next();
@@ -154,9 +155,9 @@ public class DbClient {
         return (Email)coll.findOne(new BasicDBObject("_id", new ObjectId(id)));
     }
 
-    public List<MiniEmail> getEmailsFrom(String author) {
+    public List<Email> getEmailsFrom(String author) {
         DBCursor find = coll.find(new BasicDBObject("from",author));
-        List<MiniEmail> emails = new ArrayList<MiniEmail>();
+        List<Email> emails = new ArrayList<Email>();
         while(find.hasNext()) {
             Email next = (Email) find.next();
             emails.add(next);
@@ -183,12 +184,12 @@ public class DbClient {
         return findOne.getString("_id");
     }
 
-    public List<MiniEmail> getMailinglistRoot(String mailinglist) {
+    public List<Email> getMailinglistRoot(String mailinglist) {
         BasicDBObject query= new BasicDBObject();
-        query.append(Email.ROOT_MONGO_TAG, "true");
+        query.append(Email.ROOT_MONGO_TAG, MAIL_IS_ROOT);
         query.append(Email.MAILINGLIST_MONGO_TAG,mailinglist);
         DBCursor find = coll.find(query);
-        List<MiniEmail> emails = new ArrayList<MiniEmail>();
+        List<Email> emails = new ArrayList<Email>();
         while(find.hasNext()) {
             Email next = (Email) find.next();
             emails.add(next);
@@ -196,9 +197,9 @@ public class DbClient {
         return emails;
     }
 
-    public List<MiniEmail> getWholeThreadWithMessage(String id) {
+    public List<Email> getWholeThreadWithMessage(String id) {
        Email email= (Email) getEmailWithId(id);
-       List<MiniEmail> replyPath=new ArrayList();
+       List<Email> replyPath=new ArrayList();
        if(email == null) {
            return replyPath;
        }
