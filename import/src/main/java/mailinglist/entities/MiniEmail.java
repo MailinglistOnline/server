@@ -9,6 +9,10 @@ import javax.xml.bind.annotation.XmlElement;
 import com.mongodb.BasicDBObject;
 
 
+/*
+ * Used to store information about the replies, thread roots etc. for the given email. 
+ * Therefore here is any reference to other emails, because it would make a cycle in the DB.
+ */
 public class MiniEmail extends BasicDBObject{
 
     public static final String ID_MONGO_TAG = "_id";
