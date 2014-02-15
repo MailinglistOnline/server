@@ -1,22 +1,24 @@
 package mailinglistonline.server.export.database.entities;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
-import org.bson.types.ObjectId;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.mongodb.BasicDBObject;
 
-@XmlRootElement(name = "miniemail")
-@XmlAccessorOrder
+@JsonIgnoreProperties({"_id"})
+@JsonAutoDetect(fieldVisibility=Visibility.NONE, getterVisibility=Visibility.NONE, isGetterVisibility=Visibility.NONE, setterVisibility=Visibility.NONE)
 public class MiniEmail extends BasicDBObject{
 
-    public static final String ID_MONGO_TAG = "_id";
+	private static final long serialVersionUID = 3749184648068897751L;
+	
+	public static final String ID_MONGO_TAG = "_id";
     public static final String MAILINGLIST_MONGO_TAG = "mailinglist";
     public static final String MESSAGE_ID_MONGO_TAG = "message_id";
     public static final String SUBJECT_MONGO_TAG = "subject";
@@ -28,9 +30,11 @@ public class MiniEmail extends BasicDBObject{
     public static final String HIGHLIGHTED_MAIN_CONTENT = "highlighted_main_content";
     
     private List<String> highlightedTexts = new ArrayList<String>();
+
     public MiniEmail() {
         super();
     }
+    
     /*
      * Needed when adding miniemail to mongodb
      */
@@ -45,15 +49,15 @@ public class MiniEmail extends BasicDBObject{
     	setTags(email.getTags());
     }
     
-    @XmlElement(name=ID_MONGO_TAG)
+
+    @JsonProperty
     public String getId() {
-        return new ObjectId(getString(ID_MONGO_TAG)).toString();
-        
+        return getString(ID_MONGO_TAG);
     }
 
+    @JsonProperty
     public void setId(String id) {
     	put(ID_MONGO_TAG, id);
-        
     }
 
     public void setMailingList(String mailinglist) {
@@ -105,7 +109,7 @@ public class MiniEmail extends BasicDBObject{
     	highlightedTexts=texts;
     }
     
-    public void addHighLight(String highLight) {
+    public void addHighLightMainContent(String highLight) {
     	highlightedTexts.add(highLight);
 	}
     
@@ -142,5 +146,7 @@ public class MiniEmail extends BasicDBObject{
         }
         list.add(tag);
     }
+
+
 	
 }

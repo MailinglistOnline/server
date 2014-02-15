@@ -132,6 +132,15 @@ public class EmailResource {
     	return dbClient.getMailinglistLatest(mailinglist, number);
     }
     
+    @GET
+    @Path("/email/")
+    @Produces("application/json")
+	public List<Email> getEmails(@QueryParam("mailinglist") String mailinglist, @QueryParam("from") String from,
+			@QueryParam("tag") List<String> tag)
+    {
+    	return dbClient.getEmailsNotStrictMatch(mailinglist,from,tag);
+    }
+    
     @POST
     @Path("/email/tag/")
     public void addTag(@QueryParam("id") String id,@QueryParam("tag") String tag) {

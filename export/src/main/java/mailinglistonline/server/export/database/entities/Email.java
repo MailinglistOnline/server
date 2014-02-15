@@ -7,10 +7,12 @@ package mailinglistonline.server.export.database.entities;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonValue;
 
 
 
@@ -19,6 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Matej Briškár
  */
 @XmlRootElement(name = "email")
+
 public class Email extends MiniEmail{
 
 	public static final String ROOT_MONGO_TAG = "thread_root";
@@ -36,6 +39,18 @@ public class Email extends MiniEmail{
     @XmlElement(name=ROOT_MONGO_TAG)
     public MiniEmail getRoot() {
         return (MiniEmail)get(ROOT_MONGO_TAG);
+    }
+    
+    @JsonValue
+    public String getId() {
+        return getString(ID_MONGO_TAG);
+        
+    }
+
+    @JsonProperty("id")
+    public void setId(String id) {
+    	put(ID_MONGO_TAG, id);
+        
     }
 
     public void setRoot(MiniEmail root) {

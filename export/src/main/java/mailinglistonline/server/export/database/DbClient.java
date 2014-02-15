@@ -269,12 +269,34 @@ public class DbClient {
     
 
     public List<MiniEmail> searchByContent(String content) {
-    	return searchManager.searchEmailByContent(content);
+    	List<MiniEmail> emails = searchManager.searchEmailByContent(content);
+    	return emails;
     }
 
 	public List<Email> getEmailsFromAddress(String from) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public List<Email> getEmailsNotStrictMatch(String mailinglist, String from, List<String> tags) {
+		BasicDBObject query= new BasicDBObject();
+		coll.setObjectClass(Email.class);
+		query.append(Email.MAILINGLIST_MONGO_TAG,"/.*"+mailinglist+".*/");
+		query.append(Email.FROM_MONGO_TAG,"/.*"+from+".*/");
+		DBObject inTagObject = new BasicDBObject();
+		inTagObject.put("$in", tags);
+		query.append(Email.TAGS_MONGO_TAG,inTagObject);
+        DBCursor cursor = coll.find(query);
+        List<Email> emails = new ArrayList<Email>();
+        try {
+            while (cursor.hasNext() ) {
+                Email email = (Email) cursor.next();
+                emails.add(email);
+            }
+        } finally {
+            cursor.close();
+        }
+        return emails;
 	}
 
 	
