@@ -25,7 +25,7 @@ import mailinglist.entities.MiniEmail;
 import org.bson.types.ObjectId;
 
 /**
- *
+ * DbClient responsible for the communication with the 
  * @author matej
  */
 public class DbClient {
@@ -55,7 +55,7 @@ public class DbClient {
         mongoClient.close();
     }
 
-    private void connect(String mongoUrl, String databaseName, int mongoPort, String collectionName) throws UnknownHostException {
+    private  void connect(String mongoUrl, String databaseName, int mongoPort, String collectionName) throws UnknownHostException {
     	mongoClient = new MongoClient(mongoUrl, mongoPort);
         DB db = mongoClient.getDB(databaseName);
         mongoClient.setWriteConcern(WriteConcern.SAFE);
@@ -85,7 +85,7 @@ public class DbClient {
         
     }
 
-    public boolean saveMessage(Email email) throws IOException {
+    public synchronized boolean saveMessage(Email email) throws IOException {
     	// check if the message is not already saved
         if (getId(email.getMessageId(), email.getMessageMailingList()) != null) {
             return false;
@@ -99,7 +99,7 @@ public class DbClient {
          return true;
     }
     
-    public boolean deleteMessage(Email email) throws IOException {
+    public synchronized boolean deleteMessage(Email email) throws IOException {
         coll.remove(email);
         if ( email.getInReplyTo() != null && email.getInReplyTo() !=null) {
             Email parent =(Email)coll.findOne(new ObjectId(email.getInReplyTo().getId()));
@@ -113,12 +113,12 @@ public class DbClient {
         return coll;
     }
     
-    public MiniEmail getMessage(String mongoId) {
+    public synchronized MiniEmail getMessage(String mongoId) {
         return (MiniEmail) coll.findOne(new BasicDBObject("_id",new ObjectId(mongoId)));
     }
 
 
-    public void dropTable() {
+    public synchronized void dropTable() {
         this.coll.drop();
     }
 
@@ -126,14 +126,14 @@ public class DbClient {
         return coll.count();
     }
 
-    public DBObject findFirstMessageWithMessageId(String messageId) {
+    public synchronized DBObject findFirstMessageWithMessageId(String messageId) {
         BasicDBObject idObj = new BasicDBObject("message_id", messageId);
         return coll.findOne(idObj);
 
     }
 
     // should not be used anymore
-    public List<Email> getAllEmails() {
+    public synchronized List<Email> getAllEmails() {
         coll.setObjectClass(Email.class);
          
         DBCursor cursor = coll.find();
@@ -151,7 +151,7 @@ public class DbClient {
     /*
      * Returns the ID of the object, which has the given message_ID and is in the same mailinglist
      */
-    public String getId(String messageId, String mailinglist) {
+    public synchronized String getId(String messageId, String mailinglist) {
         BasicDBObject emailObject = new BasicDBObject(Email.MESSAGE_ID_MONGO_TAG, messageId);
         emailObject.put(Email.MAILINGLIST_MONGO_TAG, mailinglist);
         BasicDBObject findOne = (BasicDBObject) coll.findOne(emailObject);

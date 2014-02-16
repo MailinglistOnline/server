@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import javax.mail.Folder;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -16,9 +19,9 @@ import javax.mail.Session;
 import javax.mail.Store;
 import javax.mail.URLName;
 import javax.mail.internet.MimeMessage;
+
 import mailinglist.DbClient;
 import mailinglist.MessageManager;
-import mailinglist.entities.Email;
 import net.fortuna.mstor.MStorFolder;
 
 /**
@@ -29,6 +32,7 @@ public class MboxImporter {
 
     private DbClient messageSaver;
 	private boolean saveAlsoToSearchisko;
+	private static ExecutorService executor;
 
     /**
      * @param args the command line arguments
@@ -36,6 +40,7 @@ public class MboxImporter {
     public static void main(String[] args) throws NoSuchProviderException, MessagingException, IOException {
         DbClient msgSaver = new DbClient();
         MboxImporter mbox = new MboxImporter(msgSaver,true);
+        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
 
 
         if (args.length == 1) {
@@ -64,7 +69,7 @@ public class MboxImporter {
         Properties props = new Properties();
         props.setProperty("mstor.mbox.metadataStrategy", "none");
         Session session = Session.getDefaultInstance(props);
-        MessageManager manager = new MessageManager(messageSaver,saveAlsoToSearchisko);
+        final MessageManager manager = new MessageManager(messageSaver,saveAlsoToSearchisko);
         Store store = session.getStore(new URLName("mstor:" + mboxDirectory));
         store.connect();
         for (File file : subfiles) {
@@ -76,8 +81,13 @@ public class MboxImporter {
             inbox.open(Folder.READ_ONLY);
             Message[] messages = inbox.getMessages();
             System.out.println("Importing" + messages.length + "messages.");
-            for (Message m : messages) {
-                    manager.createAndSaveMessage((MimeMessage) m);
+            for (final Message m : messages) {
+            	executor.execute(new Runnable() {
+                    public void run() {
+                    	manager.createAndSaveMessage((MimeMessage) m);
+                    }
+                });
+                    
             } 
         }
         store.close();
