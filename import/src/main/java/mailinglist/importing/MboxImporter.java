@@ -41,7 +41,9 @@ public class MboxImporter {
         DbClient msgSaver = new DbClient();
         MboxImporter mbox = new MboxImporter(msgSaver,true);
         executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
-
+        if(!args[0].contains("/")) {
+        	args[0]="./"+args[0];
+        }
 
         if (args.length == 1) {
             File file = new File(args[0]);
