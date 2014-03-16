@@ -55,7 +55,7 @@ public class DbClient {
         mongoClient.close();
     }
 
-    private  void connect(String mongoUrl, String databaseName, int mongoPort, String collectionName) throws UnknownHostException {
+    private synchronized void connect(String mongoUrl, String databaseName, int mongoPort, String collectionName) throws UnknownHostException {
     	mongoClient = new MongoClient(mongoUrl, mongoPort);
         DB db = mongoClient.getDB(databaseName);
         mongoClient.setWriteConcern(WriteConcern.SAFE);
@@ -122,7 +122,7 @@ public class DbClient {
         this.coll.drop();
     }
 
-    public long emailCount() {
+    public synchronized long emailCount() {
         return coll.count();
     }
 

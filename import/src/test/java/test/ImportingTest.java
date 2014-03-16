@@ -156,7 +156,7 @@ public class ImportingTest {
         assertTrue(email.getMessageId().equals("<4E7CA9DA.9040904@gmail.com>"));
         assertTrue(email.getFrom().equals("martin.kyrc@gmail.com"));
         assertEquals(email.getMessageMailingList(), "linux@lists.linux.sk");
-        assertEquals(email.getRoot().getId(), null);
+        assertEquals(email.getRoot(), null);
         assertNull(email.getAttachments());
         assertEquals("text/plain", email.getMainContent().get(0).getType());
         assertTrue(email.getMainContent().get(0).getContent().toString().startsWith("ahojte,"));
@@ -232,7 +232,7 @@ public class ImportingTest {
         assertNotNull(email);
         assertTrue(email.getMessageId().equals("<1361885169.2705.12.camel@menhir>"));
         assertTrue(email.getFrom().equals("swhiteho@redhat.com"));
-        assertEquals(email.getRoot().getId(), null);
+        assertEquals(email.getRoot(), null);
         assertEquals(email.getMessageMailingList(), "cluster-devel@redhat.com");
         assertNull(email.getInReplyTo());
         assertEquals("text/plain", email.getMainContent().get(0).get("type"));

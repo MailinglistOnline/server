@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.mail.Folder;
 import javax.mail.Message;
@@ -26,13 +27,13 @@ import net.fortuna.mstor.MStorFolder;
 
 /**
  *
- * @author matej
+ * @author Matej Briškár
  */
 public class MboxImporter {
 
-    private DbClient messageSaver;
+    private static final long TIME_TO_WAIT_FOR_THREADS = 50;
+	private DbClient messageSaver;
 	private boolean saveAlsoToSearchisko;
-	private static ExecutorService executor;
 
     /**
      * @param args the command line arguments
@@ -40,7 +41,6 @@ public class MboxImporter {
     public static void main(String[] args) throws NoSuchProviderException, MessagingException, IOException {
         DbClient msgSaver = new DbClient();
         MboxImporter mbox = new MboxImporter(msgSaver,true);
-        executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
         if(!args[0].contains("/")) {
         	args[0]="./"+args[0];
         }
@@ -65,7 +65,8 @@ public class MboxImporter {
     }
 
     public void importMboxDirectory(String directoryPath) throws NoSuchProviderException, IOException, MessagingException {
-        File directory = new File(directoryPath);
+    	ExecutorService executor =Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() + 1);
+    	File directory = new File(directoryPath);
         File[] subfiles = directory.listFiles();
         String mboxDirectory = directoryPath;
         Properties props = new Properties();
@@ -92,6 +93,12 @@ public class MboxImporter {
                     
             } 
         }
+        executor.shutdown();
+
+        try {
+        	executor.awaitTermination(TIME_TO_WAIT_FOR_THREADS, TimeUnit.SECONDS);
+         } catch (InterruptedException ex) {
+         }
         store.close();
     }
 

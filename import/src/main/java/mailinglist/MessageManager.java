@@ -75,8 +75,9 @@ public class MessageManager {
         }
         Email email = new Email();
         email.setMessageId(message.getMessageID());
-        email.setDate(message.getSentDate().getTime());
-
+        if(message.getSentDate() != null) {
+        	email.setDate(message.getSentDate().getTime());
+        }
         String fromField = extractEmailAddress(message.getFrom()[0].toString());
         email.setFrom(fromField);
         Map<String, List<ContentPart>> list = getContentParts(message,false);
