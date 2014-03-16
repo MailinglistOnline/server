@@ -9,16 +9,19 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringBufferInputStream;
 import java.net.UnknownHostException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -45,6 +48,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.gridfs.GridFSDBFile;
 
 /**
  *
@@ -55,6 +59,7 @@ public class ImportingTest {
     public static final String TEST_MAILS_PATH = "src/test/java/mboxes/test-mails";
     public static final String TEST_MAILS_PATH2 ="src/test/java/mboxes/test-mails2";
     public static final String SIMPLE_MAIL_PATH ="src/test/java/mboxes/simpleMail";
+    public static final String BINARIES_MAIL_PATH ="src/test/java/mboxes/oneimageonedoublepdfodt.mbox";
     public static final String MBOX_FOLDER_PATH ="src/test/java/mboxes/folder";
     private DbClient dbClient;
     private int mongoPort = 27017;
@@ -104,7 +109,40 @@ public class ImportingTest {
         mbox.importMboxDirectory(MBOX_FOLDER_PATH);
         assertEquals( "Any email should not be added twice",72+62+1,dbClient.emailCount());
         writeDBItems();
-
+    }
+    
+    @Test
+    public void testBinaries() throws UnknownHostException, NoSuchProviderException, MessagingException, IOException {
+        MboxImporter mbox = new MboxImporter(dbClient,false);
+        mbox.importMbox(BINARIES_MAIL_PATH);
+        // one email has two mailinglists
+        assertEquals(2, dbClient.emailCount());
+        assertEquals(3, dbClient.filesCount());
+        mbox.importMbox(BINARIES_MAIL_PATH);
+        assertEquals(2, dbClient.emailCount());
+        assertEquals(3, dbClient.filesCount());
+        
+        
+        Email email=(Email) dbClient.findFirstMessageWithMessageId("<CAGc8r1XFOSW96dVvnWvaq0tMBdQeGR+X95YNpX+r6qJoZbHhBg@mail.gmail.com>");
+        ArrayList<ContentPart> attachments = email.getAttachments();
+        assertEquals(2, attachments.size());
+        String firstLink=attachments.get(0).getLink();
+        String secondLink=attachments.get(1).getLink();
+        GridFSDBFile firstFile = dbClient.findFileById(firstLink);
+        GridFSDBFile secondFile = dbClient.findFileById(secondLink);
+        
+        assertEquals(firstLink, firstFile.getId().toString());
+        assertEquals(secondLink, secondFile.getId().toString());
+        
+        byte[] buf = new byte[100*1024];
+        firstFile.getInputStream().read(buf,0, 100*1024);
+        String str = new String(buf, "UTF-8");
+        assertTrue(str.startsWith("UEsDBBQAAAgAAM6BcERexjIMJwAAACcAAAAIAAAAbWltZXR5cGVhcH"));
+        
+        secondFile.getInputStream().read(buf,0, 100*1024);
+        str = new String(buf, "UTF-8");
+        assertTrue(str.startsWith("JVBERi0xLjQKJcOkw7zDtsOfCjIgMCBvYmoKP"));
+        
     }
 
     @Test

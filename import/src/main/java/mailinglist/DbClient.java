@@ -11,6 +11,9 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
+import com.mongodb.gridfs.GridFS;
+import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.gridfs.GridFSInputFile;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -30,11 +33,15 @@ import org.bson.types.ObjectId;
  */
 public class DbClient {
 
-    private static String DATABASE_PROPERTIES_FILE_NAME = "database.properties";
+	// fs is default also
+    private static final String MONGODB_FILES_COLLECTION = "fs";
+
+	private static String DATABASE_PROPERTIES_FILE_NAME = "database.properties";
     
     List<String> mailingLists;
     MongoClient mongoClient;
     DBCollection coll;
+    DB db;
 
     public DbClient() throws UnknownHostException, IOException {
         Properties prop = new Properties();
@@ -57,7 +64,7 @@ public class DbClient {
 
     private synchronized void connect(String mongoUrl, String databaseName, int mongoPort, String collectionName) throws UnknownHostException {
     	mongoClient = new MongoClient(mongoUrl, mongoPort);
-        DB db = mongoClient.getDB(databaseName);
+        db = mongoClient.getDB(databaseName);
         mongoClient.setWriteConcern(WriteConcern.SAFE);
         coll = db.getCollection(collectionName);
         coll.setObjectClass(Email.class);
@@ -88,8 +95,17 @@ public class DbClient {
     public synchronized boolean saveMessage(Email email) throws IOException {
     	// check if the message is not already saved
         if (getId(email.getMessageId(), email.getMessageMailingList()) != null) {
+        	if (email.getAttachments() !=null) {
+        		for(ContentPart part: email.getAttachments()) {
+        			if(part.getLink() !=null) {
+        				deleteFile(part.getLink());
+        			}
+        		}
+        	}
             return false;
         } 
+        
+        
         coll.insert(email);
         if ( email.getInReplyTo() != null && email.getInReplyTo().getId()!=null) {
             Email parent =(Email)coll.findOne(new ObjectId(email.getInReplyTo().getId()));
@@ -99,8 +115,28 @@ public class DbClient {
          return true;
     }
     
+    public String createFile(byte[] bytes, String fileName, String contentType) {
+    	GridFS files = new GridFS(db, MONGODB_FILES_COLLECTION);
+    	GridFSInputFile gfsFile =files.createFile(bytes);
+    	if(fileName!=null) {
+    		gfsFile.setFilename(fileName);
+    	}
+    	gfsFile.setContentType(contentType);
+    	gfsFile.save();
+    	return gfsFile.getId().toString();
+    }
+    public void deleteFile(String id) {
+    	GridFS files = new GridFS(db, MONGODB_FILES_COLLECTION);
+    	files.remove(new ObjectId(id));
+    }
+    
     public synchronized boolean deleteMessage(Email email) throws IOException {
         coll.remove(email);
+        for(ContentPart cp : email.getAttachments()) {
+        	if(cp.getLink() != null) {
+        		deleteFile(cp.getLink());
+        	}
+        }
         if ( email.getInReplyTo() != null && email.getInReplyTo() !=null) {
             Email parent =(Email)coll.findOne(new ObjectId(email.getInReplyTo().getId()));
             parent.removeReply(email);
@@ -113,6 +149,10 @@ public class DbClient {
         return coll;
     }
     
+    public DBCollection getFilesColl() {
+        return db.getCollection(MONGODB_FILES_COLLECTION + ".files");
+    }
+    
     public synchronized MiniEmail getMessage(String mongoId) {
         return (MiniEmail) coll.findOne(new BasicDBObject("_id",new ObjectId(mongoId)));
     }
@@ -120,10 +160,22 @@ public class DbClient {
 
     public synchronized void dropTable() {
         this.coll.drop();
+        db.getCollection(MONGODB_FILES_COLLECTION + ".files").drop();;
+        db.getCollection(MONGODB_FILES_COLLECTION + ".chunks").drop();
     }
 
     public synchronized long emailCount() {
         return coll.count();
+    }
+    
+
+    public synchronized long filesCount() {
+        return db.getCollection(MONGODB_FILES_COLLECTION + ".files").count();
+    }
+    
+    public GridFSDBFile findFileById(String id) {
+    	GridFS gfs = new GridFS(db, MONGODB_FILES_COLLECTION);
+    	return gfs.findOne(new ObjectId(id));
     }
 
     public synchronized DBObject findFirstMessageWithMessageId(String messageId) {

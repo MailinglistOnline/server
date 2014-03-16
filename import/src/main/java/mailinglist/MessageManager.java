@@ -4,9 +4,6 @@
  */
 package mailinglist;
 
-import edu.emory.mathcs.backport.java.util.Collections;
-import exceptions.MalformedMessageException;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,14 +21,16 @@ import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.swing.event.ListSelectionEvent;
 
-import org.apache.commons.collections.set.CompositeSet.SetMutator;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.IOUtils;
 
-import searchisko.SearchManager;
+import com.sun.mail.util.BASE64DecoderStream;
+
 import mailinglist.entities.ContentPart;
 import mailinglist.entities.Email;
-import mailinglist.entities.MiniEmail;
+import searchisko.SearchManager;
+import exceptions.MalformedMessageException;
 
 /**
  *
@@ -177,6 +176,7 @@ public class MessageManager {
         Map<String, List<ContentPart>> list = new HashMap();
         list.put("main", new ArrayList<ContentPart>());
         list.put("attachments", new ArrayList<ContentPart>());
+        if(!Part.ATTACHMENT.equals(p.getDisposition())) {
         if (p.isMimeType("text/*")) {
             String s = (String) p.getContent();
             if (p.isMimeType("text/html")) {
@@ -247,7 +247,32 @@ public class MessageManager {
                         list.get("attachments").addAll(getContentParts(mp.getBodyPart(i),mainPartFound).get("attachments"));
                     }
             }
-            return list;
+        }
+        } else {
+        	ContentPart cp = new ContentPart();
+        	int indexForParsingContentType= p.getContentType().indexOf("name=");
+        	String parsedContentType = null;
+        	if (indexForParsingContentType != -1) {
+   			 parsedContentType = p.getContentType().substring(0,indexForParsingContentType-2);
+        	} else {
+        		parsedContentType=p.getContentType();
+        	}
+        	
+        	cp.setType(parsedContentType);
+        	if(p.getContent() instanceof BASE64DecoderStream) {
+        		BASE64DecoderStream base64DecoderStream = (BASE64DecoderStream)p.getContent();
+        		 byte[] byteArray = IOUtils.toByteArray(base64DecoderStream);
+        		 byte[] encodeBase64 = Base64.encodeBase64(byteArray);
+        		 int indexOfFileName = p.getContentType().indexOf("name=");
+        		 String fileName = null;
+        		 if (indexOfFileName != -1) {
+        			 fileName=p.getContentType().substring(indexOfFileName+6);
+        			 fileName=fileName.substring(0,fileName.length()-1);
+        		 }
+        		 String fileId=dbClient.createFile(encodeBase64,fileName,parsedContentType);
+        		 cp.setLink(fileId);
+        	}
+        	list.get("attachments").add(cp);
         }
 
         return list;

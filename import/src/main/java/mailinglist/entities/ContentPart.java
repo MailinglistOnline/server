@@ -32,4 +32,12 @@ public class ContentPart extends BasicDBObject{
         put("text", content);
     }
     
+    public String getLink() {
+        return getString("link");
+    }
+
+    public void setLink(String link) {
+        put("link", link);
+    }
+    
 }
