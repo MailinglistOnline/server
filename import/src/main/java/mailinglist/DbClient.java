@@ -105,8 +105,9 @@ public class DbClient {
             return false;
         } 
         
-        
         coll.insert(email);
+        email.setEmailShardKey(email.getMessageMailingList() + email.getId());
+        coll.save(email);
         if ( email.getInReplyTo() != null && email.getInReplyTo().getId()!=null) {
             Email parent =(Email)coll.findOne(new ObjectId(email.getInReplyTo().getId()));
             parent.addReply(email);
