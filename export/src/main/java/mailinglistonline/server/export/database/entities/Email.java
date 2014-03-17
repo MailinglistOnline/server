@@ -29,6 +29,7 @@ public class Email extends MiniEmail{
     public static final String REPLIES_MONGO_TAG = "replies";
     public static final String ATTACHMENTS_MONGO_TAG = "attachments";
     public static final String MAIN_CONTENT_MONGO_TAG = "main_content";
+    public static final String SHARD_KEY_MONGO_TAG = "email_shard_key";
     
     
     public Email() {
@@ -118,5 +119,13 @@ public class Email extends MiniEmail{
         ArrayList<ContentPart> list =(ArrayList<ContentPart>) get(ATTACHMENTS_MONGO_TAG);
         return list;
     }
+    
+    public String getEmailShardKey() {
+		return getString(SHARD_KEY_MONGO_TAG);
+	}
+
+	public void setEmailShardKey(String messageId) {
+		put(SHARD_KEY_MONGO_TAG, messageId);
+	}
     
 }

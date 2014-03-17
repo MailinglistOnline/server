@@ -5,6 +5,7 @@
 package mailinglistonline.server.export.database.entities;
 
 import com.mongodb.BasicDBObject;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -31,5 +32,14 @@ public class ContentPart extends BasicDBObject{
     public void setContent(String content) {
         put("text", content);
     }
+    
+    public String getLink() {
+        return getString("link");
+    }
+
+    public void setLink(String link) {
+        put("link", link);
+    }
+    
     
 }

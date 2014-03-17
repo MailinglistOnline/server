@@ -13,6 +13,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
+import org.bson.types.ObjectId;
+
 import mailinglistonline.server.export.database.DbClient;
 import mailinglistonline.server.export.database.entities.Email;
 import mailinglistonline.server.export.database.entities.MiniEmail;
@@ -46,7 +48,7 @@ public class EmailResource {
     @Produces("application/json")
     //@Wrapped(element="emails")
     public List<Email> getAllEmails() {
-        return dbClient.getAllEmails();
+        return normalizeIds(dbClient.getAllEmails());
     }
     
     @GET
@@ -54,7 +56,10 @@ public class EmailResource {
     @Produces("application/json")
     //@Wrapped(element="emails")
     public Email getEmailById(@QueryParam("id") String id) {
-         return dbClient.getEmailWithId(id);
+    	Email email = dbClient.getEmailWithId(id);
+    	ObjectId objectId=(ObjectId)email.get("_id");
+		email.setId(objectId.toStringMongod());
+        return email;
 
     }
      
@@ -75,7 +80,7 @@ public class EmailResource {
     @Produces("application/json")
     //@Wrapped(element="emails")
     public List<Email> getEmailByAuthor(@QueryParam("from") String author) {
-        return dbClient.getEmailsFrom(author);
+        return normalizeIds(dbClient.getEmailsFrom(author));
          
     }
     
@@ -84,7 +89,7 @@ public class EmailResource {
     @Produces("application/json")
     //@Wrapped(element="emails")
     public List<Email> getMailingListRoots(@QueryParam("mailinglist") String mailinglist) {
-        return dbClient.getMailinglistRoot(mailinglist);
+        return normalizeIds(dbClient.getMailinglistRoot(mailinglist));
          
     }
     
@@ -93,7 +98,7 @@ public class EmailResource {
     @Produces("application/json")
     //@Wrapped(element="emails")
     public List<Email> getMailingListRoots(@QueryParam("from") int fromNumber,@QueryParam("to") int toNumber,@QueryParam("mailinglist") String mailinglist) {
-        List<Email> list=dbClient.getMailinglistRoot(mailinglist);
+        List<Email> list=normalizeIds(dbClient.getMailinglistRoot(mailinglist));
         if(fromNumber > toNumber) {
             return new ArrayList<Email>();
         }
@@ -110,7 +115,7 @@ public class EmailResource {
     @Produces("application/json")
     //@Wrapped(element="emails")
     public List<Email> getEmailPath(@QueryParam("id") String id) {
-        List<Email> list=dbClient.getWholeThreadWithMessage(id);
+        List<Email> list=normalizeIds(dbClient.getWholeThreadWithMessage(id));
         return list;
          
     }
@@ -120,7 +125,7 @@ public class EmailResource {
     @Produces("application/json")
     //@Wrapped(element="emails")
     public List<Email> getEmailsFromAddress(@QueryParam("from") String from) {
-        List<Email> list=dbClient.getEmailsFromAddress(from);
+        List<Email> list=normalizeIds(dbClient.getEmailsFromAddress(from));
         return list;
     }
     
@@ -129,7 +134,7 @@ public class EmailResource {
     @Produces("application/json")
     //@Wrapped(element="emails")
     public List<Email> getMailinglistLatest(@QueryParam("mailinglist") String mailinglist, @QueryParam("number") int number) {
-    	return dbClient.getMailinglistLatest(mailinglist, number);
+    	return normalizeIds(dbClient.getMailinglistLatest(mailinglist, number));
     }
     
     @GET
@@ -138,7 +143,7 @@ public class EmailResource {
 	public List<Email> getEmails(@QueryParam("mailinglist") String mailinglist, @QueryParam("from") String from,
 			@QueryParam("tag") List<String> tag)
     {
-    	return dbClient.getEmailsNotStrictMatch(mailinglist,from,tag);
+    	return normalizeIds(dbClient.getEmailsNotStrictMatch(mailinglist,from,tag));
     }
     
     @POST
@@ -153,8 +158,26 @@ public class EmailResource {
     @Produces("application/json")
     //@Wrapped(element="emails")
     public List<MiniEmail> searchEmailByContent(@QueryParam("content") String content) {
-    	return dbClient.searchByContent(content);
+    	List<MiniEmail> emails = dbClient.searchByContent(content);
+    	for(MiniEmail email : emails) {
+    		ObjectId id=(ObjectId)email.get("_id");
+    		email.setId(id.toStringMongod());
+    	}
+    	return emails;
     }
+    
+    /*
+     * When being parsed to json, the parser does not look on the get methods, it is behaving differently
+     * because MiniEmails extends Map. No need to send 4 objects in the id field.
+     */
+    private List<Email> normalizeIds(List<Email> miniEmails) {
+    	for(MiniEmail email : miniEmails) {
+    		ObjectId id=(ObjectId)email.get("_id");
+    		email.setId(id.toStringMongod());
+    	}
+    	return miniEmails;
+    }
+    
     
     
  
