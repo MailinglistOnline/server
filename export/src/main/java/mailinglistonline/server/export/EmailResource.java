@@ -159,10 +159,6 @@ public class EmailResource {
     //@Wrapped(element="emails")
     public List<MiniEmail> searchEmailByContent(@QueryParam("content") String content) {
     	List<MiniEmail> emails = dbClient.searchByContent(content);
-    	for(MiniEmail email : emails) {
-    		ObjectId id=(ObjectId)email.get("_id");
-    		email.setId(id.toStringMongod());
-    	}
     	return emails;
     }
     
