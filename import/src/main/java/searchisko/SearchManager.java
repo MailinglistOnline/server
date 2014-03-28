@@ -5,15 +5,15 @@ import java.util.Properties;
 
 import mailinglist.entities.Email;
 
+import org.apache.http.auth.Credentials;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.bson.types.ObjectId;
 import org.jboss.resteasy.client.ClientExecutor;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 public class SearchManager {
 
@@ -51,6 +51,8 @@ private static String SERVER_PROPERTIES_FILE_NAME = "searchisko.properties";
 		}
 		
 		public boolean addEmail(Email email) {
+			ObjectId id =(ObjectId)email.get("_id");
+			email.setId(id.toStringMongod());
 			searchiskoProxy.sendEmail(email,email.getId());
 			return true;
 		}
