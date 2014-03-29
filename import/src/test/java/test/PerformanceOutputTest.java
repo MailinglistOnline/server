@@ -1,15 +1,13 @@
 package test;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.IOException;
 import java.net.UnknownHostException;
 
 import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 
-import mailinglist.DbClient;
 import mailinglist.importing.MboxImporter;
+import mailinglistonline.server.export.database.DbClient;
 
 import org.junit.After;
 import org.junit.AfterClass;

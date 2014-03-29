@@ -22,14 +22,17 @@ import javax.mail.Part;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import mailinglistonline.server.export.database.DbClient;
+import mailinglistonline.server.export.database.entities.ContentPart;
+import mailinglistonline.server.export.database.entities.Email;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 
+import searchisko.SearchManager;
+
 import com.sun.mail.util.BASE64DecoderStream;
 
-import mailinglist.entities.ContentPart;
-import mailinglist.entities.Email;
-import searchisko.SearchManager;
 import exceptions.MalformedMessageException;
 
 /**

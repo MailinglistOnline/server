@@ -9,14 +9,12 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringBufferInputStream;
 import java.net.UnknownHostException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -33,13 +31,13 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import mailinglist.DbClient;
 import mailinglist.MessageManager;
-import mailinglist.entities.ContentPart;
-import mailinglist.entities.Email;
-import mailinglist.entities.MiniEmail;
 import mailinglist.importing.MboxImporter;
 import mailinglist.importing.MessageReceiver;
+import mailinglistonline.server.export.database.DbClient;
+import mailinglistonline.server.export.database.entities.ContentPart;
+import mailinglistonline.server.export.database.entities.Email;
+import mailinglistonline.server.export.database.entities.MiniEmail;
 
 import org.junit.After;
 import org.junit.AfterClass;

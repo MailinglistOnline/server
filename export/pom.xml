@@ -2,93 +2,30 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.jboss.mailinglistonline</groupId>
+    <parent>
+        <artifactId>server-parent</artifactId>
+        <groupId>org.mailinglistonline</groupId>
+        <version>0.1-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
     <artifactId>server-export</artifactId>
-    <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
-    <name>server-export</name>
-
+    <name>Server exporting module</name>
     <properties>
         <endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
     </properties>
-<repositories>
-		<!-- You should seriously consider using a repository manager or declare 
-			repositories in your settings.xml. See http://www.sonatype.com/people/2009/02/why-putting-repositories-in-your-poms-is-a-bad-idea/ -->
-		<repository>
-			<id>jboss-public-repository-group</id>
-			<name>JBoss Public Maven Repository Group</name>
-			<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-			<layout>default</layout>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</snapshots>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>jboss-public-repository-group</id>
-			<name>JBoss Public Maven Repository Group</name>
-			<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-			<layout>default</layout>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
 
- <dependencyManagement>
-    <dependencies>
-        <dependency>
-            <groupId>org.jboss.arquillian</groupId>
-            <artifactId>arquillian-bom</artifactId>
-            <version>1.0.4.Final</version>
-            <scope>import</scope>
-            <type>pom</type>
-        </dependency>
-    </dependencies>
-</dependencyManagement>
     <dependencies> 
-<!--        <dependency>
-            <groupId>org.mnode.mstor</groupId>
-            <artifactId>mstor</artifactId>
-            <version>0.9.13</version>
-        </dependency>-->
-        
         <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>bson</artifactId>
-            <version>2.10.1</version>
-        </dependency>
+	   <groupId>org.jboss.resteasy</groupId>
+           <artifactId>resteasy-jackson-provider</artifactId>
+           <version>2.2.1.GA</version>
+	</dependency>
         <dependency>
-		    <groupId>org.jboss.resteasy</groupId>
-		    <artifactId>resteasy-jackson-provider</artifactId>
-		    <version>2.2.1.GA</version>
-		</dependency>
-        
-        <dependency>
-   		    <groupId>org.jboss.arquillian.junit</groupId>
-  		    <artifactId>arquillian-junit-container</artifactId>
+   	    <groupId>org.jboss.arquillian.junit</groupId>
+  	    <artifactId>arquillian-junit-container</artifactId>
             <scope>test</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.jboss.resteasy</groupId>
-            <artifactId>resteasy-jaxrs</artifactId>
-            <version>2.3.5.Final</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -103,40 +40,31 @@
             <type>pom</type>
             <scope>provided</scope>
          </dependency>
-        
         <dependency>
-	<groupId>org.mongodb</groupId>
-	<artifactId>mongo-java-driver</artifactId>
-	<version>2.10.1</version>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
+            <version>1.0.0.CR3</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-    <groupId>org.jboss.arquillian.container</groupId>
-    <artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
-    <version>1.0.0.CR3</version>
-    <scope>test</scope>
-</dependency>
-<dependency>
-    <groupId>org.jboss.weld</groupId>
-    <artifactId>weld-core</artifactId>
-    <version>1.1.5.Final</version>
-    <scope>test</scope>
-</dependency>
-<dependency>
-    <groupId>org.slf4j</groupId>
-    <artifactId>slf4j-simple</artifactId>
-    <version>1.6.4</version>
-    <scope>test</scope>
-</dependency>
-        
-        
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-core</artifactId>
+            <version>1.1.5.Final</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.6.4</version>
+            <scope>test</scope>
+        </dependency> 
     </dependencies>
 
 
  
     <build>
-   <pluginManagement>
+      <pluginManagement>
         <plugins>
-        
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -155,12 +83,13 @@
                 <version>2.1.1</version>
                 <configuration>
                     <failOnMissingWebXml>false</failOnMissingWebXml>
+		    <attachClasses>true</attachClasses>
                 </configuration>
             </plugin>
             <plugin>
-    <artifactId>maven-surefire-plugin</artifactId>
-    <version>2.12</version>
-</plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -186,6 +115,19 @@
                     </execution>
                 </executions>
             </plugin>
+	    <plugin>
+<groupId>org.apache.maven.plugins</groupId>
+<artifactId>maven-jar-plugin</artifactId>
+<executions>
+<execution>
+<id>make-a-jar</id>
+<phase>compile</phase>
+<goals>
+<goal>jar</goal>
+</goals>
+</execution>
+</executions>
+</plugin>
         </plugins>
         </pluginManagement>
     </build>

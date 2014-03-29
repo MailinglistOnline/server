@@ -9,7 +9,7 @@ import java.util.Properties;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
-import mailinglist.DbClient;
+import mailinglistonline.server.export.database.DbClient;
 import mailinglist.MessageManager;
 
 /**

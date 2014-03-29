@@ -3,7 +3,7 @@ package searchisko;
 import java.io.IOException;
 import java.util.Properties;
 
-import mailinglist.entities.Email;
+import mailinglistonline.server.export.database.entities.Email;
 
 import org.apache.http.auth.Credentials;
 import org.apache.http.auth.UsernamePasswordCredentials;

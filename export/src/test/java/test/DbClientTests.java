@@ -57,59 +57,57 @@ public class DbClientTests {
         email1.setFrom("from1@from1.sk");
         email1.setMessageId("message1");
         email1.setRoot(new MiniEmail());
-        email1.addMailingList("mailinglist1");
-        dbClient.saveMessage(email1);
+        email1.setMailingList("mailinglist1");
+        //dbClient.(email1);
         insertedEmails.add(email1);
 
         Email email2 = new Email();
         email2.setFrom("from2@from2.sk");
         email2.setMessageId("message2");
-        email2.setRoot(email1.getId());
-        email2.setInReplyTo(email1.getId());
-        email2.addMailingList("mailinglist1");
-        dbClient.saveMessage(email2);
+        email2.setRoot(email1);
+        email2.setInReplyTo(email1);
+       // email2.addMailingList("mailinglist1");
+        //dbClient.saveMessage(email2);
         insertedEmails.add(email2);
 
         Email email3 = new Email();
         email3.setFrom("from3@from3.sk");
         email3.setMessageId("message3");
-        email3.setRoot(email1.getId());
-        email3.setInReplyTo(email1.getId());
-        email3.addMailingList("mailinglist2");
-        dbClient.saveMessage(email3);
+        email3.setRoot(email1);
+        email3.setInReplyTo(email1);
+        email3.setMailingList("mailinglist2");
+        //dbClient.saveMessage(email3);
         insertedEmails.add(email3);
 
         Email email4 = new Email();
         email4.setFrom("from4@from4.sk");
         email4.setMessageId("message4");
-        email4.setRoot(email1.getId());
-        email4.setInReplyTo(email3.getId());
-        email4.addMailingList("mailinglist1");
-        dbClient.saveMessage(email4);
+        email4.setRoot(email1);
+        email4.setInReplyTo(email3);
+        email4.setMailingList("mailinglist1");
+        //dbClient.saveMessage(email4);
         insertedEmails.add(email4);
 
         Email email5 = new Email();
         email5.setFrom("from2@from2.sk");
         email5.setMessageId("message5");
-        email5.setRoot("true");
-        email5.addMailingList("mailinglist1");
-        dbClient.saveMessage(email5);
+        email5.setRoot(null);
+        email5.setMailingList("mailinglist1");
+        //dbClient.saveMessage(email5);
         insertedEmails.add(email5);
 
     }
 
     @After
     public void tearDown() {
-
         dbClient.dropTable();
     }
 
     @Test
     public void getEmailById() {
         Email email = dbClient.getEmailWithId(insertedEmails.get(0).getId());
-        email.setReplies(new ArrayList<String>());
+        email.setReplies(new ArrayList<MiniEmail>());
         assertEquals(email,insertedEmails.get(0));
-        
     }
 
     @Test
@@ -117,7 +115,7 @@ public class DbClientTests {
         assertEquals(5, dbClient.getAllEmails().size());
         List<Email> allEmails = dbClient.getAllEmails();
         for (Email email : allEmails) {
-            email.setReplies(new ArrayList<String>());
+            email.setReplies(new ArrayList<MiniEmail>());
         }
         for (int i = 0; i < insertedEmails.size(); i++) {
             Email email =insertedEmails.get(i);
@@ -133,7 +131,7 @@ public class DbClientTests {
         
         fromEmails = dbClient.getEmailsFrom("from2@from2.sk");
         for (Email email : fromEmails) {
-            email.setReplies(new ArrayList<String>());
+            email.setReplies(new ArrayList<MiniEmail>());
         }
         assertEquals(2, fromEmails.size());
         assertTrue(insertedEmails.contains(fromEmails.get(0)));
@@ -144,7 +142,7 @@ public class DbClientTests {
     public void getMailingListRoots() {
         List<Email> pathEmails = dbClient.getMailinglistRoot("mailinglist1");
         for (Email email : pathEmails) {
-            email.setReplies(new ArrayList<String>());
+            email.setReplies(new ArrayList<MiniEmail>());
         }
         
         assertEquals(pathEmails.size(),2);
@@ -152,16 +150,16 @@ public class DbClientTests {
         assertTrue(pathEmails.contains(insertedEmails.get(4)));
     }
 
-    @Test
+   /* @Test
     public void getEmailPath() {
         List<Email> pathEmails = dbClient.getWholePathFromId(insertedEmails.get(0).getId());
         for (Email email : pathEmails) {
-            email.setReplies(new ArrayList<String>());
+            email.setReplies(new ArrayList<MiniEmail>());
         }
         assertTrue(pathEmails.contains(insertedEmails.get(0)));
         assertTrue(pathEmails.contains(insertedEmails.get(1)));
         assertTrue(pathEmails.contains(insertedEmails.get(2)));
         assertTrue(pathEmails.contains(insertedEmails.get(3)));
         
-    }
+    }*/
 }

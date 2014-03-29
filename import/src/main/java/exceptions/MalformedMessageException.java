@@ -6,11 +6,14 @@ package exceptions;
 
 /**
  *
- * @author matej
+ * @author Matej Briškár
  */
 public class MalformedMessageException extends Exception {
 
-    public MalformedMessageException() {
+
+	private static final long serialVersionUID = 1L;
+
+	public MalformedMessageException() {
     }
     
 }

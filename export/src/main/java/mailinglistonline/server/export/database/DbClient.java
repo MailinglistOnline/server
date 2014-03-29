@@ -11,6 +11,9 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
+import com.mongodb.gridfs.GridFS;
+import com.mongodb.gridfs.GridFSDBFile;
+import com.mongodb.gridfs.GridFSInputFile;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -40,6 +43,7 @@ import org.bson.types.ObjectId;
 
 @Singleton
 public class DbClient {
+	private static final String MONGODB_FILES_COLLECTION = "fs";
     private static String DATABASE_PROPERTIES_FILE_NAME = "database.properties";
     private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "mailinglists.properties";
     private static String MAIL_IS_ROOT=null;
@@ -48,6 +52,8 @@ public class DbClient {
     DBCollection coll;
     SearchManager searchManager;
     MongoClient mongoClient;
+    DB db;
+
 
     public DbClient() throws UnknownHostException, IOException {
         Properties prop = new Properties();
@@ -83,9 +89,9 @@ public class DbClient {
         connect(mongoUrl, databaseName, mongoPort, collectionName);
     }
 
-    private void connect(String mongoUrl, String databaseName, int mongoPort, String collectionName) throws UnknownHostException {
+    private synchronized void connect(String mongoUrl, String databaseName, int mongoPort, String collectionName) throws UnknownHostException {
         mongoClient = new MongoClient(mongoUrl, mongoPort);
-        DB db = mongoClient.getDB(databaseName);
+        db = mongoClient.getDB(databaseName);
         mongoClient.setWriteConcern(WriteConcern.SAFE);
         coll = db.getCollection(collectionName);
          coll.setObjectClass(Email.class);
@@ -115,20 +121,47 @@ public class DbClient {
     @PreDestroy
     public void closeConnection() {
         mongoClient.close();
+        //files db probably also need to be closed
     }
 
-    
+    public DBCollection getFilesColl() {
+        return db.getCollection(MONGODB_FILES_COLLECTION + ".files");
+    }
 
     public DBCollection getColl() {
         return coll;
     }
 
-    public void dropTable() {
+    public synchronized void dropTable() {
         this.coll.drop();
+        db.getCollection(MONGODB_FILES_COLLECTION + ".files").drop();;
+        db.getCollection(MONGODB_FILES_COLLECTION + ".chunks").drop();
     }
 
     public long emailCount() {
         return coll.count();
+    }
+    
+    public synchronized long filesCount() {
+        return db.getCollection(MONGODB_FILES_COLLECTION + ".files").count();
+    }
+    
+    public GridFSDBFile findFileById(String id) {
+    	GridFS gfs = new GridFS(db, MONGODB_FILES_COLLECTION);
+    	return gfs.findOne(new ObjectId(id));
+    }
+    
+    /*
+     * Returns the ID of the object, which has the given message_ID and is in the same mailinglist
+     */
+    public synchronized String getId(String messageId, String mailinglist) {
+        BasicDBObject emailObject = new BasicDBObject(Email.MESSAGE_ID_MONGO_TAG, messageId);
+        emailObject.put(Email.MAILINGLIST_MONGO_TAG, mailinglist);
+        BasicDBObject findOne = (BasicDBObject) coll.findOne(emailObject);
+        if (findOne == null) {
+            return null;
+        }
+        return findOne.getString("_id");
     }
 
     public Email findFirstMessageWithMessageId(String messageId) {
@@ -153,6 +186,64 @@ public class DbClient {
 
     public Email getEmailWithId(String id) {
         return (Email)coll.findOne(new BasicDBObject("_id", new ObjectId(id)));
+    }
+    
+    public synchronized MiniEmail getMessage(String mongoId) {
+        return (MiniEmail) coll.findOne(new BasicDBObject("_id",new ObjectId(mongoId)));
+    }
+    
+    public synchronized boolean saveMessage(Email email) throws IOException {
+    	// check if the message is not already saved
+        if (getId(email.getMessageId(), email.getMessageMailingList()) != null) {
+        	if (email.getAttachments() !=null) {
+        		for(ContentPart part: email.getAttachments()) {
+        			if(part.getLink() !=null) {
+        				deleteFile(part.getLink());
+        			}
+        		}
+        	}
+            return false;
+        } 
+        
+        coll.insert(email);
+        email.setEmailShardKey(email.getMessageMailingList() + email.getId());
+        coll.save(email);
+        if ( email.getInReplyTo() != null && email.getInReplyTo().getId()!=null) {
+            Email parent =(Email)coll.findOne(new ObjectId(email.getInReplyTo().getId()));
+            parent.addReply(email);
+            coll.save(parent);
+        }
+         return true;
+    }
+    
+    public synchronized boolean deleteMessage(Email email) throws IOException {
+        coll.remove(email);
+        for(ContentPart cp : email.getAttachments()) {
+        	if(cp.getLink() != null) {
+        		deleteFile(cp.getLink());
+        	}
+        }
+        if ( email.getInReplyTo() != null && email.getInReplyTo() !=null) {
+            Email parent =(Email)coll.findOne(new ObjectId(email.getInReplyTo().getId()));
+            parent.removeReply(email);
+            coll.save(parent);
+        }
+         return true;
+     }
+    
+    public String createFile(byte[] bytes, String fileName, String contentType) {
+    	GridFS files = new GridFS(db, MONGODB_FILES_COLLECTION);
+    	GridFSInputFile gfsFile =files.createFile(bytes);
+    	if(fileName!=null) {
+    		gfsFile.setFilename(fileName);
+    	}
+    	gfsFile.setContentType(contentType);
+    	gfsFile.save();
+    	return gfsFile.getId().toString();
+    }
+    public void deleteFile(String id) {
+    	GridFS files = new GridFS(db, MONGODB_FILES_COLLECTION);
+    	files.remove(new ObjectId(id));
     }
 
     public List<Email> getEmailsFrom(String author) {

@@ -21,7 +21,7 @@ import javax.mail.Store;
 import javax.mail.URLName;
 import javax.mail.internet.MimeMessage;
 
-import mailinglist.DbClient;
+import mailinglistonline.server.export.database.DbClient;
 import mailinglist.MessageManager;
 import net.fortuna.mstor.MStorFolder;
 
