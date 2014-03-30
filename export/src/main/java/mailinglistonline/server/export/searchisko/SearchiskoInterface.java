@@ -45,5 +45,11 @@ public interface SearchiskoInterface {
 	    @Produces("application/json")
 	    public Map<String, Object> searchEmailByContent(@QueryParam("query") String query, @QueryParam("query_highlight") Boolean highlight);
 	    
+		@POST
+	    @Path("/content/mlonline_email/{sys_content_id}")
+		@Consumes("application/json")
+	    public void sendEmail(Email email, @PathParam("sys_content_id") String id);
+		
+	    
 	    
 }

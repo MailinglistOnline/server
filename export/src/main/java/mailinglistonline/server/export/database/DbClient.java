@@ -32,6 +32,7 @@ import mailinglistonline.server.export.database.entities.Email;
 import mailinglistonline.server.export.database.entities.Mailinglist;
 import mailinglistonline.server.export.database.entities.MiniEmail;
 import mailinglistonline.server.export.searchisko.SearchManager;
+import mailinglistonline.server.export.searchisko.SearchiskoConfiguration;
 import mailinglistonline.server.export.searchisko.SearchiskoResponseParser;
 
 import org.bson.types.ObjectId;
@@ -56,21 +57,27 @@ public class DbClient {
 
 
     public DbClient() throws UnknownHostException, IOException {
-        Properties prop = new Properties();
-        searchManager = new SearchManager();
-        prop.load(DbClient.class.getClassLoader().getResourceAsStream((DATABASE_PROPERTIES_FILE_NAME)));
-        Integer defaultPort = Integer.valueOf(prop.getProperty("defaultMongoPort"));
-        String databaseUrl = prop.getProperty("defaultMongoUrl");
-        String defaultDatabaseName = prop.getProperty("defaultDatabaseName");
-        String defaultCollectionName = prop.getProperty("defaultCollection");
-        connect(databaseUrl, defaultDatabaseName, defaultPort, defaultCollectionName);
-        readMailinglists();
-
+    	this(new DatabaseConfiguration().readFromConfigurationFile(
+    			DbClient.class.getClassLoader().getResource((DATABASE_PROPERTIES_FILE_NAME)).getPath()));
     }
     
-    public void readMailinglists() throws IOException {
+    public DbClient(DatabaseConfiguration configuration) {
+    	searchManager = new SearchManager();
+        try {
+			connect(configuration.getDatabaseUrl(), configuration.getDefaultDatabaseName(), configuration.getDefaultPort(), configuration.getDefaultCollectionName());
+		} catch (UnknownHostException e) {
+			
+		}
+        readMailinglists();
+    }
+    
+    public void readMailinglists() {
         Properties prop = new Properties();
-        prop.load(DbClient.class.getClassLoader().getResourceAsStream((MAILINGLISTS_PROPERTIES_FILE_NAME)));
+        try {
+			prop.load(DbClient.class.getClassLoader().getResourceAsStream((MAILINGLISTS_PROPERTIES_FILE_NAME)));
+		} catch (IOException e) {
+			throw new IllegalArgumentException("Unable to read mailinglist property file.");
+		}
         String mailinglist = prop.getProperty("mailinglist." + 1);
         int i = 1;
         while (mailinglist != null) {

@@ -29,7 +29,7 @@ import mailinglistonline.server.export.database.entities.Email;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 
-import searchisko.SearchManager;
+import searchisko.SearchManagerProxy;
 
 import com.sun.mail.util.BASE64DecoderStream;
 
@@ -42,7 +42,7 @@ import exceptions.MalformedMessageException;
 public class MessageManager {
 
     private DbClient dbClient;
-    private SearchManager searchManager;
+    private SearchManagerProxy searchManager;
     private final ArrayList<String> mailingLists;
 	private boolean sendMessagesToSearchisko=true;
     private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "mailinglists.properties";
@@ -53,7 +53,7 @@ public class MessageManager {
     }
     public MessageManager(DbClient dbClient) throws IOException {
         this.dbClient = dbClient;
-        searchManager = new SearchManager();
+        searchManager = new SearchManagerProxy();
         mailingLists = new ArrayList<String>();
         Properties prop = new Properties();
         prop.load(DbClient.class.getClassLoader().getResourceAsStream((MAILINGLISTS_PROPERTIES_FILE_NAME)));

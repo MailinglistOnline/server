@@ -21,8 +21,9 @@ import javax.mail.Store;
 import javax.mail.URLName;
 import javax.mail.internet.MimeMessage;
 
-import mailinglistonline.server.export.database.DbClient;
 import mailinglist.MessageManager;
+import mailinglistonline.server.export.database.DatabaseConfiguration;
+import mailinglistonline.server.export.database.DbClient;
 import net.fortuna.mstor.MStorFolder;
 
 /**
@@ -32,6 +33,7 @@ import net.fortuna.mstor.MStorFolder;
 public class MboxImporter {
 
     private static final long TIME_TO_WAIT_FOR_THREADS = 50;
+    private static String DATABASE_PROPERTIES_FILE_NAME = "database.properties";
 	private DbClient messageSaver;
 	private boolean saveAlsoToSearchisko;
 
@@ -39,7 +41,8 @@ public class MboxImporter {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws NoSuchProviderException, MessagingException, IOException {
-        DbClient msgSaver = new DbClient();
+    	DbClient msgSaver =new DbClient(new DatabaseConfiguration().readFromConfigurationFile(
+    			MboxImporter.class.getClassLoader().getResource((DATABASE_PROPERTIES_FILE_NAME)).getPath()));
         MboxImporter mbox = new MboxImporter(msgSaver,true);
         if(!args[0].contains("/")) {
         	args[0]="./"+args[0];
