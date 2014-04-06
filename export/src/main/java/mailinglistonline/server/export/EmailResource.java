@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -28,7 +29,9 @@ import org.bson.types.ObjectId;
 @Path("/emails")
 public class EmailResource {
     
-    @Inject
+    private static final String ALL_REGEX = ".*";
+	private static final String MAILINGLIST_REPRESENTING_ALL = "all";
+	@Inject
     DbClient dbClient;
     
     public EmailResource() throws UnknownHostException, IOException {
@@ -65,7 +68,12 @@ public class EmailResource {
     @Path("/mailinglist/roots/all")
     @Produces("application/json")
     public List<Email> getMailingListRoots(@QueryParam("mailinglist") String mailinglist) {
-        return normalizeIds(dbClient.getMailinglistRoot(mailinglist));
+    	if(MAILINGLIST_REPRESENTING_ALL.equals(mailinglist)) {
+    		return normalizeIds(dbClient.getMailinglistRoot(Pattern.compile(ALL_REGEX)));
+    	} else {
+    		return normalizeIds(dbClient.getMailinglistRoot(mailinglist));
+    	}
+        
          
     }
     
@@ -106,7 +114,11 @@ public class EmailResource {
     @Path("/mailinglist/latest/")
     @Produces("application/json")
     public List<Email> getMailinglistLatest(@QueryParam("mailinglist") String mailinglist, @QueryParam("number") int number) {
-    	return normalizeIds(dbClient.getMailinglistLatest(mailinglist, number));
+    	if(MAILINGLIST_REPRESENTING_ALL.equals(mailinglist)) {
+    		return normalizeIds(dbClient.getMailinglistLatest(Pattern.compile(ALL_REGEX),number));
+    	} else {
+    		return normalizeIds(dbClient.getMailinglistLatest(mailinglist, number));
+    	}
     }
     
     @GET
@@ -129,6 +141,7 @@ public class EmailResource {
     @Path("/search/content")
     @Produces("application/json")
     public List<MiniEmail> searchEmailByContent(@QueryParam("content") String content) {
+    	//TODO: when used searchisko filtering, do not forget for the all
     	List<MiniEmail> emails = dbClient.searchByContent(content);
     	return emails;
     }

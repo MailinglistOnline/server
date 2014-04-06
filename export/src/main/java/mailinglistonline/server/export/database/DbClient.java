@@ -20,6 +20,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import javax.annotation.PreDestroy;
 import javax.ejb.Singleton;
@@ -39,7 +40,7 @@ import org.bson.types.ObjectId;
 
 /**
  *
- * @author matej
+ * @author Matej Briškár
  */
 
 @Singleton
@@ -47,7 +48,7 @@ public class DbClient {
 	private static final String MONGODB_FILES_COLLECTION = "fs";
     private static String DATABASE_PROPERTIES_FILE_NAME = "database.properties";
     private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "mailinglists.properties";
-    private static String MAIL_IS_ROOT=null;
+    private static String MAIL_IS_ROOT_VALUE=null;
 
     List<Mailinglist> mailingLists = new ArrayList<Mailinglist>();
     DBCollection coll;
@@ -92,7 +93,9 @@ public class DbClient {
         
     }
 
+    @Deprecated
     public DbClient(String mongoUrl, String databaseName, int mongoPort, String collectionName) throws UnknownHostException {
+    	//TODO: deprecated. change for the DatabaseConfiguration only
         connect(mongoUrl, databaseName, mongoPort, collectionName);
     }
 
@@ -261,6 +264,7 @@ public class DbClient {
             Email next = (Email) find.next();
             emails.add(next);
         }
+        find.close();
         return emails;
     }
     
@@ -283,9 +287,9 @@ public class DbClient {
         return findOne.getString("_id");
     }
 
-    public List<Email> getMailinglistRoot(String mailinglist) {
+    public List<Email> getMailinglistRoot(Object mailinglist) {
         BasicDBObject query= new BasicDBObject();
-        query.append(Email.ROOT_MONGO_TAG, MAIL_IS_ROOT);
+        query.append(Email.ROOT_MONGO_TAG, MAIL_IS_ROOT_VALUE);
         query.append(Email.MAILINGLIST_MONGO_TAG,mailinglist);
         DBCursor find = coll.find(query);
         List<Email> emails = new ArrayList<Email>();
@@ -293,6 +297,7 @@ public class DbClient {
             Email next = (Email) find.next();
             emails.add(next);
         }
+        find.close();
         return emails;
     }
 
@@ -336,6 +341,9 @@ public class DbClient {
     
     public void addTagToEmail(String emailId, String tag) {
 		Email email = getEmailWithId(emailId);
+		if((email.getTags() != null) && (email.getTags().contains(tag))) {
+			return;
+		}
 		email.addTag(tag);
 		try {
 			updateEmail(email);
@@ -345,7 +353,7 @@ public class DbClient {
 		}
 	}
     
-    public List<Email> getMailinglistLatest(String mailinglist, int number) {
+    public List<Email> getMailinglistLatest(Object mailinglist, int number) {
 		BasicDBObject query= new BasicDBObject();
 		coll.setObjectClass(Email.class);
 		query.append(Email.MAILINGLIST_MONGO_TAG,mailinglist);
