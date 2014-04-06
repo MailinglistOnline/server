@@ -31,10 +31,6 @@ import mailinglistonline.server.export.database.entities.Mailinglist;
 public class MailingListResource {
     @Inject
     DbClient dbClient;
-    
-    
-    public MailingListResource() {
-    }
 
     @GET
     @Path("/all")

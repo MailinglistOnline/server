@@ -1,9 +1,12 @@
 package mailinglistonline.server.export.database.entities;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
+
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -25,9 +28,9 @@ public class MiniEmail extends BasicDBObject{
     // message snippet is the first x letters from the email
     public static final String MESSAGE_SNIPPET_MONGO_TAG = "message_snippet";
     public static final String TAGS_MONGO_TAG = "tags";
-    public static final String HIGHLIGHTED_MAIN_CONTENT = "highlighted_main_content";
+    public static final String HIGHLIGHTED = "highlighted";
     
-    private List<String> highlightedTexts = new ArrayList<String>();
+    private Map<String,List<String>> highlighted;
 
     public MiniEmail() {
         super();
@@ -98,17 +101,21 @@ public class MiniEmail extends BasicDBObject{
          put(DATE_MONGO_TAG, sentDate);
     }
     
-    @XmlElement(name=HIGHLIGHTED_MAIN_CONTENT)
-    public List<String> getHighlightedTexts() {
-		return highlightedTexts;
+    @XmlElement(name=HIGHLIGHTED)
+    public Map<String,List<String>> getHighlighted() {
+		return highlighted;
     }
     
-    public void setHighlightedTexts(List<String> texts) {
-    	highlightedTexts=texts;
-    }
-    
-    public void addHighLightMainContent(String highLight) {
-    	highlightedTexts.add(highLight);
+    public void addHighLight(String key,String value) {
+    	Map<String,List<String>> object = (Map<String,List<String>>)get(HIGHLIGHTED);
+        if(object == null) {
+            append(HIGHLIGHTED,new HashMap<String,List<String>>());
+            object = (Map<String,List<String>>)get(HIGHLIGHTED);
+        }
+        if(object.get(key) == null ) {
+        	object.put(key, new ArrayList<String>());
+        }
+        object.get(key).add(value);
 	}
     
     

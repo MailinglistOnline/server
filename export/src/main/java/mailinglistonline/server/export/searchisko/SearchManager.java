@@ -60,8 +60,9 @@ public class SearchManager {
 		
 		public boolean addEmail(Email email) {
 			ObjectId id =(ObjectId)email.get("_id");
-			email.setId(id.toStringMongod());
-			emailClient.sendEmail(email,email.getId());
+			email.setId("mlonline_email-" + id.toStringMongod());
+			email.put("mongo_id",id.toStringMongod());
+			emailClient.sendEmail(email,id.toStringMongod());
 			return true;
 		}
 		

@@ -22,11 +22,21 @@
 	   <artifactId>mail</artifactId>
 	   <version>1.4.2</version>
         </dependency>
-	<dependency>
+		<dependency>
             <groupId>org.mailinglistonline</groupId>
             <artifactId>server-export</artifactId>
-	    <type>jar</type>
-	    <classifier>classes</classifier>
+	   	    <type>jar</type>
+	    	<classifier>classes</classifier>
+        </dependency>
+        <dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.2.1</version>
+		</dependency>
+	<dependency>
+           <groupId>org.jboss.resteasy</groupId>
+           <artifactId>resteasy-jaxrs</artifactId>
+           <version>3.0.6.Final</version>
         </dependency>
     </dependencies>
 </project>

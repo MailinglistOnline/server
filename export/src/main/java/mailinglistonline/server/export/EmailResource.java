@@ -5,7 +5,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.faces.bean.RequestScoped;
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -13,26 +13,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import org.bson.types.ObjectId;
-
 import mailinglistonline.server.export.database.DbClient;
 import mailinglistonline.server.export.database.entities.Email;
 import mailinglistonline.server.export.database.entities.MiniEmail;
 
-//import org.jboss.resteasy.annotations.providers.jaxb.Wrapped;
-
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
+import org.bson.types.ObjectId;
 
 /**
  *
  * @author Matej Briškár
  */
 
-@RequestScoped
+@ApplicationScoped
 @Path("/emails")
 public class EmailResource {
     
@@ -46,7 +38,6 @@ public class EmailResource {
     @GET
     @Path("/all")
     @Produces("application/json")
-    //@Wrapped(element="emails")
     public List<Email> getAllEmails() {
         return normalizeIds(dbClient.getAllEmails());
     }
@@ -54,7 +45,6 @@ public class EmailResource {
     @GET
     @Path("/email/id")
     @Produces("application/json")
-    //@Wrapped(element="emails")
     public Email getEmailById(@QueryParam("id") String id) {
     	Email email = dbClient.getEmailWithId(id);
     	ObjectId objectId=(ObjectId)email.get("_id");
@@ -62,23 +52,10 @@ public class EmailResource {
         return email;
 
     }
-     
-    /* Should not be needed anymore because the replies are in the emails now
-     
-    @GET
-    @Path("/replies/id")
-    @Produces("application/xml")
-    @Wrapped(element="emails")
-    public List<Email> getEmailReplies(@QueryParam("id") String id) {
-         ArrayList<Email> list= new ArrayList<Email>();
-         return dbClient.getEmailReplies(id);
-    }
-    */
     
     @GET
     @Path("/from")
     @Produces("application/json")
-    //@Wrapped(element="emails")
     public List<Email> getEmailByAuthor(@QueryParam("from") String author) {
         return normalizeIds(dbClient.getEmailsFrom(author));
          
@@ -87,7 +64,6 @@ public class EmailResource {
     @GET
     @Path("/mailinglist/roots/all")
     @Produces("application/json")
-    //@Wrapped(element="emails")
     public List<Email> getMailingListRoots(@QueryParam("mailinglist") String mailinglist) {
         return normalizeIds(dbClient.getMailinglistRoot(mailinglist));
          
@@ -96,7 +72,6 @@ public class EmailResource {
     @GET
     @Path("/mailinglist/roots/")
     @Produces("application/json")
-    //@Wrapped(element="emails")
     public List<Email> getMailingListRoots(@QueryParam("from") int fromNumber,@QueryParam("to") int toNumber,@QueryParam("mailinglist") String mailinglist) {
         List<Email> list=normalizeIds(dbClient.getMailinglistRoot(mailinglist));
         if(fromNumber > toNumber) {
@@ -113,7 +88,6 @@ public class EmailResource {
     @GET
     @Path("/thread/")
     @Produces("application/json")
-    //@Wrapped(element="emails")
     public List<Email> getEmailPath(@QueryParam("id") String id) {
         List<Email> list=normalizeIds(dbClient.getWholeThreadWithMessage(id));
         return list;
@@ -123,7 +97,6 @@ public class EmailResource {
     @GET
     @Path("/from/")
     @Produces("application/json")
-    //@Wrapped(element="emails")
     public List<Email> getEmailsFromAddress(@QueryParam("from") String from) {
         List<Email> list=normalizeIds(dbClient.getEmailsFromAddress(from));
         return list;
@@ -132,7 +105,6 @@ public class EmailResource {
     @GET
     @Path("/mailinglist/latest/")
     @Produces("application/json")
-    //@Wrapped(element="emails")
     public List<Email> getMailinglistLatest(@QueryParam("mailinglist") String mailinglist, @QueryParam("number") int number) {
     	return normalizeIds(dbClient.getMailinglistLatest(mailinglist, number));
     }
@@ -156,7 +128,6 @@ public class EmailResource {
     @GET
     @Path("/search/content")
     @Produces("application/json")
-    //@Wrapped(element="emails")
     public List<MiniEmail> searchEmailByContent(@QueryParam("content") String content) {
     	List<MiniEmail> emails = dbClient.searchByContent(content);
     	return emails;
