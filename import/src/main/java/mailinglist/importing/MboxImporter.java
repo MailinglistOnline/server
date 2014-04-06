@@ -55,7 +55,7 @@ public class MboxImporter {
             } else {
                 mbox.importMbox(args[0]);
             }
-
+            msgSaver.closeConnection();
         } else {
             System.out.println("Call the method with one parameter (mbox path)");
         }
@@ -78,34 +78,36 @@ public class MboxImporter {
         final MessageManager manager = new MessageManager(messageSaver,saveAlsoToSearchisko);
         Store store = session.getStore(new URLName("mstor:" + mboxDirectory));
         store.connect();
-        for (File file : subfiles) {
+        for (final File file : subfiles) {
             if (file.isDirectory()) {
                 importMboxDirectory(file.getAbsolutePath());
-            }
-            String mboxFile = file.getName();
-            Folder inbox = store.getDefaultFolder().getFolder(mboxFile);
-            inbox.open(Folder.READ_ONLY);
-            Message[] messages = inbox.getMessages();
-            System.out.println("Importing" + messages.length + "messages.");
-            for (final Message m : messages) {
+            } else {
             	executor.execute(new Runnable() {
                     public void run() {
-                    	manager.createAndSaveMessage((MimeMessage) m);
+                    	try {
+							importMbox(file.getAbsolutePath());
+						} catch (Exception e) {
+							System.err.println("Unable to import Mbox file: " + file.getAbsolutePath());
+						}
                     }
                 });
-                    
-            } 
+            	
+            }
+           
         }
         executor.shutdown();
 
         try {
         	executor.awaitTermination(TIME_TO_WAIT_FOR_THREADS, TimeUnit.SECONDS);
          } catch (InterruptedException ex) {
-         }
+         } 
         store.close();
     }
 
     public void importMbox(String mboxPath) throws NoSuchProviderException, MessagingException, IOException {
+    	if(! (mboxPath.endsWith(".mbox")|| mboxPath.endsWith(".txt") ) ) {
+    		return;
+    	}
         File file = new File(mboxPath);
         String mboxFile = file.getName();
         String mboxDirectory = file.getParentFile().getAbsolutePath();
