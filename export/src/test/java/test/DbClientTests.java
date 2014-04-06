@@ -56,7 +56,7 @@ public class DbClientTests {
         Email email1 = new Email();
         email1.setFrom("from1@from1.sk");
         email1.setMessageId("message1");
-        email1.setRoot(new MiniEmail());
+        email1.setRoot(null);
         email1.setMailingList("mailinglist1");
         //dbClient.(email1);
         insertedEmails.add(email1);

@@ -257,18 +257,6 @@ public class DbClient {
     	files.remove(new ObjectId(id));
     }
 
-    public List<Email> getEmailsFrom(String author) {
-        DBCursor find = coll.find(new BasicDBObject("from",author));
-        List<Email> emails = new ArrayList<Email>();
-        while(find.hasNext()) {
-            Email next = (Email) find.next();
-            emails.add(next);
-        }
-        find.close();
-        return emails;
-    }
-    
-  
     public boolean updateEmail(Email newEmail) throws IOException {
 
         coll.save(newEmail);
@@ -353,38 +341,10 @@ public class DbClient {
 		}
 	}
     
-    public List<Email> getMailinglistLatest(Object mailinglist, int number) {
-		BasicDBObject query= new BasicDBObject();
-		coll.setObjectClass(Email.class);
-		query.append(Email.MAILINGLIST_MONGO_TAG,mailinglist);
-		DBObject orderBy = new BasicDBObject();
-		orderBy.put(Email.DATE_MONGO_TAG, -1);
-        DBCursor cursor = coll.find(query).sort(orderBy);
-        List<Email> emails = new ArrayList<Email>();
-        try {
-            while (cursor.hasNext() && number >0) {
-                Email email = (Email) cursor.next();
-                emails.add(email);
-                number = number -1;
-            }
-        } finally {
-            cursor.close();
-        }
-        return emails;
-	}
-    
-
-    
-
     public List<MiniEmail> searchByContent(String content) {
     	List<MiniEmail> emails = searchManager.searchEmailByContent(content);
     	return emails;
     }
-
-	public List<Email> getEmailsFromAddress(String from) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	public List<Email> getEmailsNotStrictMatch(String mailinglist, String from, List<String> tags) {
 		BasicDBObject query= new BasicDBObject();
@@ -395,6 +355,50 @@ public class DbClient {
 		inTagObject.put("$in", tags);
 		query.append(Email.TAGS_MONGO_TAG,inTagObject);
         DBCursor cursor = coll.find(query);
+        List<Email> emails = new ArrayList<Email>();
+        try {
+            while (cursor.hasNext() ) {
+                Email email = (Email) cursor.next();
+                emails.add(email);
+            }
+        } finally {
+            cursor.close();
+        }
+        return emails;
+	}
+
+	public List<Email> getEmails(String from, Object mailinglist, List<String> tags, int count, List<String> ascending, List<String> descending) {
+		BasicDBObject query= new BasicDBObject();
+		coll.setObjectClass(Email.class);
+		if(mailinglist !=null && !mailinglist.equals("")) {
+			query.append(Email.MAILINGLIST_MONGO_TAG,mailinglist);
+		}
+		if(from !=null && !from.equals("")) {
+			query.append(Email.FROM_MONGO_TAG,from);
+		}
+		if(tags !=null && tags.size() != 0) {
+			DBObject inTagObject = new BasicDBObject();
+			inTagObject.put("$in", tags);
+			query.append(Email.TAGS_MONGO_TAG,inTagObject);
+		}
+		DBCursor cursor = coll.find(query);
+		BasicDBObject sortingObject = new BasicDBObject();
+		if(ascending !=null && ascending.size() != 0) {
+			for(String sortParameter : ascending) {
+				sortingObject.append(sortParameter, 1);
+			}
+		}
+		if(descending !=null && descending.size() != 0) {
+			for(String sortParameter : descending) {
+				sortingObject.append(sortParameter, -1);
+			}
+		}
+        if(sortingObject.size() != 0) {
+        	cursor.sort(sortingObject);
+        }
+        if(count != 0) {
+        	cursor.limit(count);
+        }
         List<Email> emails = new ArrayList<Email>();
         try {
             while (cursor.hasNext() ) {
