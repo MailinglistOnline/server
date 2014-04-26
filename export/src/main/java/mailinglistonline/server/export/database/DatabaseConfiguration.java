@@ -9,6 +9,8 @@ public class DatabaseConfiguration {
     private String databaseUrl;
     private String defaultDatabaseName;
     private String defaultCollectionName;
+	private String user;
+	private String password;
     
     public Integer getDefaultPort() {
 		return defaultPort;
@@ -21,6 +23,18 @@ public class DatabaseConfiguration {
 	}
 	public void setDatabaseUrl(String databaseUrl) {
 		this.databaseUrl = databaseUrl;
+	}
+	public String getUser() {
+		return user;
+	}
+	public void setUser(String user) {
+		this.user = user;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
 	}
 	public String getDefaultDatabaseName() {
 		return defaultDatabaseName;
@@ -46,6 +60,8 @@ public class DatabaseConfiguration {
         this.databaseUrl = prop.getProperty("defaultMongoUrl");
         this.defaultDatabaseName = prop.getProperty("defaultDatabaseName");
         this.defaultCollectionName = prop.getProperty("defaultCollection");
+        this.user = prop.getProperty("user");
+        this.password = prop.getProperty("password");
 		return this;
 	}
 }

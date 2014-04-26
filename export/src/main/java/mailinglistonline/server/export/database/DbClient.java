@@ -71,7 +71,9 @@ public class DbClient {
 			connect(configuration.getDatabaseUrl(),
 					configuration.getDefaultDatabaseName(),
 					configuration.getDefaultPort(),
-					configuration.getDefaultCollectionName());
+					configuration.getDefaultCollectionName(),
+					configuration.getUser(),
+					configuration.getPassword());
 		} catch (UnknownHostException e) {
 
 		}
@@ -106,13 +108,16 @@ public class DbClient {
 	public DbClient(String mongoUrl, String databaseName, int mongoPort,
 			String collectionName) throws UnknownHostException {
 		// TODO: deprecated. change for the DatabaseConfiguration only
-		connect(mongoUrl, databaseName, mongoPort, collectionName);
+		connect(mongoUrl, databaseName, mongoPort, collectionName, null, null);
 	}
 
 	private synchronized void connect(String mongoUrl, String databaseName,
-			int mongoPort, String collectionName) throws UnknownHostException {
+			int mongoPort, String collectionName, String user, String password) throws UnknownHostException {
 		mongoClient = new MongoClient(mongoUrl, mongoPort);
 		db = mongoClient.getDB(databaseName);
+		if(user != null && password !=null) {
+			db.authenticate(user, password.toCharArray());
+		}
 		mongoClient.setWriteConcern(WriteConcern.SAFE);
 		coll = db.getCollection(collectionName);
 		coll.setObjectClass(Email.class);
