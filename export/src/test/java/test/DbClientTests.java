@@ -9,9 +9,11 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import mailinglistonline.server.export.database.DatabaseConfiguration;
 import mailinglistonline.server.export.database.DbClient;
 import mailinglistonline.server.export.database.entities.Email;
 import mailinglistonline.server.export.database.entities.MiniEmail;
+import mailinglistonline.server.export.util.PropertiesParser;
 
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.After;
@@ -23,29 +25,21 @@ import static org.junit.Assert.*;
 
 /**
  *
- * @author matej
+ * @author Matej Briškár
  */
 @RunWith(Arquillian.class)
 public class DbClientTests {
 
-	//@Inject I have to create dbClient with not default parameters. In the future, use Alternative or producer method???
     private DbClient dbClient;
-    private int mongoPort = 27017;
-    private String mongoUrl = "localhost";
-    private String databaseName = "testdb";
-    private String collectionName = "test";
     private ArrayList<Email> insertedEmails;
 
-    // i am not using injection
-   /* @Deployment
-    public static JavaArchive createDeployment() {
-        return ShrinkWrap.create(JavaArchive.class)
-            .addClass(DbClient.class)
-            .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
-    }*/
-    
     public DbClientTests() throws UnknownHostException, IOException {
-        dbClient = new DbClient(mongoUrl, databaseName, mongoPort, collectionName);
+        DatabaseConfiguration configuration = PropertiesParser.parseDatabaseConfigurationFile(DbClient.class
+				.getClass()
+				.getResource((DbClient.DATABASE_PROPERTIES_FILE_NAME))
+				.getPath());
+        configuration.setDefaultCollectionName("test");
+        dbClient = new DbClient(configuration);
         dbClient.dropTable();
     }
     
