@@ -49,19 +49,5 @@ public class DatabaseConfiguration {
 		this.defaultCollectionName = defaultCollectionName;
 	}
 	
-	public DatabaseConfiguration readFromConfigurationFile(String path) {
-		Properties prop = new Properties();
-		try {
-			prop.load(new FileInputStream(path));
-		} catch (IOException e) {
-			throw new IllegalArgumentException("Reading database configuration file threw and exception for file path " + path, e);
-		}
-		this.defaultPort = Integer.valueOf(prop.getProperty("defaultMongoPort"));
-        this.databaseUrl = prop.getProperty("defaultMongoUrl");
-        this.defaultDatabaseName = prop.getProperty("defaultDatabaseName");
-        this.defaultCollectionName = prop.getProperty("defaultCollection");
-        this.user = prop.getProperty("user");
-        this.password = prop.getProperty("password");
-		return this;
-	}
+	
 }

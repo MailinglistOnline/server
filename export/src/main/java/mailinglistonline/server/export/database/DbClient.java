@@ -35,6 +35,7 @@ import mailinglistonline.server.export.database.entities.MiniEmail;
 import mailinglistonline.server.export.searchisko.SearchManager;
 import mailinglistonline.server.export.searchisko.SearchiskoConfiguration;
 import mailinglistonline.server.export.searchisko.SearchiskoResponseParser;
+import mailinglistonline.server.export.util.PropertiesParser;
 
 import org.bson.types.ObjectId;
 
@@ -46,7 +47,7 @@ import org.bson.types.ObjectId;
 @Singleton
 public class DbClient {
 	private static final String MONGODB_FILES_COLLECTION = "fs";
-	private static String DATABASE_PROPERTIES_FILE_NAME = "database.properties";
+	public static final String DATABASE_PROPERTIES_FILE_NAME = "/database.properties";
 	private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "mailinglists.properties";
 	private static String MAIL_IS_ROOT_VALUE = null;
 
@@ -57,12 +58,10 @@ public class DbClient {
 	DB db;
 
 	public DbClient() throws UnknownHostException, IOException {
-		this(
-				new DatabaseConfiguration()
-						.readFromConfigurationFile(DbClient.class
-								.getClassLoader()
-								.getResource((DATABASE_PROPERTIES_FILE_NAME))
-								.getPath()));
+		this(PropertiesParser.parseDatabaseConfigurationFile(DbClient.class
+				.getClass()
+				.getResource(DATABASE_PROPERTIES_FILE_NAME)
+				.getPath()));
 	}
 
 	public DbClient(DatabaseConfiguration configuration) {

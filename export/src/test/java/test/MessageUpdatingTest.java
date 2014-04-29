@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -27,10 +28,12 @@ import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import mailinglistonline.server.export.database.DatabaseConfiguration;
 import mailinglistonline.server.export.database.DbClient;
 import mailinglistonline.server.export.database.entities.ContentPart;
 import mailinglistonline.server.export.database.entities.Email;
 import mailinglistonline.server.export.database.entities.MiniEmail;
+import mailinglistonline.server.export.util.PropertiesParser;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -53,13 +56,18 @@ public class MessageUpdatingTest {
    public static final String BINARIES_MAIL_PATH ="src/test/java/mboxes/oneimageonedoublepdfodt.mbox";
    public static final String MBOX_FOLDER_PATH ="src/test/java/mboxes/folder";
    private DbClient dbClient;
-   private int mongoPort = 27017;
-   private String mongoUrl = "localhost";
-   private String databaseName = "testdb";
-   private String collectionName = "test";
 
    public MessageUpdatingTest() throws UnknownHostException {
-       dbClient = new DbClient(mongoUrl, databaseName, mongoPort, collectionName);
+	   Class<? extends Class> class1 = DbClient.class.getClass();
+	   URL resource = class1.getResource(DbClient.DATABASE_PROPERTIES_FILE_NAME);
+	   resource.getPath();
+	   DatabaseConfiguration configuration = PropertiesParser.parseDatabaseConfigurationFile(DbClient.class
+				.getClass()
+				.getResource(DbClient.DATABASE_PROPERTIES_FILE_NAME)
+				.getPath());
+       configuration.setDefaultCollectionName("test");
+       dbClient = new DbClient(configuration);
+       dbClient.dropTable();
    }
 
    @BeforeClass
