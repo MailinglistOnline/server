@@ -24,6 +24,7 @@ import javax.mail.internet.MimeMessage;
 import mailinglist.MessageManager;
 import mailinglistonline.server.export.database.DatabaseConfiguration;
 import mailinglistonline.server.export.database.DbClient;
+import mailinglistonline.server.export.util.PropertiesParser;
 import net.fortuna.mstor.MStorFolder;
 
 /**
@@ -41,7 +42,7 @@ public class MboxImporter {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws NoSuchProviderException, MessagingException, IOException {
-    	DbClient msgSaver =new DbClient(new DatabaseConfiguration().readFromConfigurationFile(
+    	DbClient msgSaver =new DbClient(PropertiesParser.parseDatabaseConfigurationFile(
     			MboxImporter.class.getClassLoader().getResource((DATABASE_PROPERTIES_FILE_NAME)).getPath()));
         MboxImporter mbox = new MboxImporter(msgSaver,true);
         if(!args[0].contains("/")) {

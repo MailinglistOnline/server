@@ -54,9 +54,9 @@ import com.mongodb.gridfs.GridFSDBFile;
  */
 public class ImportingTest {
 
-    public static final String TEST_MAILS_PATH = "src/test/java/mboxes/test-mails";
-    public static final String TEST_MAILS_PATH2 ="src/test/java/mboxes/test-mails2";
-    public static final String SIMPLE_MAIL_PATH ="src/test/java/mboxes/simpleMail";
+    public static final String TEST_MAILS_PATH = "src/test/java/mboxes/test-mails.mbox";
+    public static final String TEST_MAILS_PATH2 ="src/test/java/mboxes/test-mails2.mbox";
+    public static final String SIMPLE_MAIL_PATH ="src/test/java/mboxes/simpleMail.mbox";
     public static final String BINARIES_MAIL_PATH ="src/test/java/mboxes/oneimageonedoublepdfodt.mbox";
     public static final String MBOX_FOLDER_PATH ="src/test/java/mboxes/folder";
     private DbClient dbClient;
@@ -189,6 +189,7 @@ public class ImportingTest {
         mbox.importMbox(TEST_MAILS_PATH2);
 
         Email email=(Email) dbClient.findFirstMessageWithMessageId("<4E7CA9DA.9040904@gmail.com>");
+        assertNotNull(email);
         assertTrue(email.getMessageId().equals("<4E7CA9DA.9040904@gmail.com>"));
         assertTrue(email.getFrom().equals("martin.kyrc@gmail.com"));
         assertEquals(email.getMessageMailingList(), "linux@lists.linux.sk");
