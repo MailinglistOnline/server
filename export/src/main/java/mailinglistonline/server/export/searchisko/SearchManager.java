@@ -19,13 +19,13 @@ import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 public class SearchManager {
 
-	    private static String SERVER_PROPERTIES_FILE_NAME = "searchisko.properties";
+	    private static String SERVER_PROPERTIES_FILE_NAME = "/searchisko.properties";
 		private SearchiskoConfiguration configuration;
 		SearchiskoInterface emailClient;
 
 		public SearchManager() {
 			this(new SearchiskoConfiguration().readFromPropertyFile(
-					SearchManager.class.getClassLoader().getResource((SERVER_PROPERTIES_FILE_NAME)).getPath()),false);
+					SearchManager.class.getClass().getResource((SERVER_PROPERTIES_FILE_NAME)).getPath()),false);
 		}
 		
 		public SearchManager(SearchiskoConfiguration configuration, boolean authentication) {

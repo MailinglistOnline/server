@@ -48,7 +48,7 @@ import org.bson.types.ObjectId;
 public class DbClient {
 	private static final String MONGODB_FILES_COLLECTION = "fs";
 	public static final String DATABASE_PROPERTIES_FILE_NAME = "/database.properties";
-	private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "mailinglists.properties";
+	private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "/mailinglists.properties";
 	private static String MAIL_IS_ROOT_VALUE = null;
 
 	List<Mailinglist> mailingLists = new ArrayList<Mailinglist>();
@@ -82,7 +82,7 @@ public class DbClient {
 	public void readMailinglists() {
 		Properties prop = new Properties();
 		try {
-			prop.load(DbClient.class.getClassLoader().getResourceAsStream(
+			prop.load(DbClient.class.getClass().getResourceAsStream(
 					(MAILINGLISTS_PROPERTIES_FILE_NAME)));
 		} catch (IOException e) {
 			throw new IllegalArgumentException(
@@ -205,7 +205,7 @@ public class DbClient {
 	}
 
 	public Email findFirstMessageWithMessageId(String messageId) {
-		BasicDBObject idObj = new BasicDBObject("message_id", messageId);
+		BasicDBObject idObj = new BasicDBObject(MiniEmail.MESSAGE_ID_MONGO_TAG, messageId);
 		return (Email) coll.findOne(idObj);
 	}
 

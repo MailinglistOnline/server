@@ -58,9 +58,6 @@ public class MessageUpdatingTest {
    private DbClient dbClient;
 
    public MessageUpdatingTest() throws UnknownHostException {
-	   Class<? extends Class> class1 = DbClient.class.getClass();
-	   URL resource = class1.getResource(DbClient.DATABASE_PROPERTIES_FILE_NAME);
-	   resource.getPath();
 	   DatabaseConfiguration configuration = PropertiesParser.parseDatabaseConfigurationFile(DbClient.class
 				.getClass()
 				.getResource(DbClient.DATABASE_PROPERTIES_FILE_NAME)
