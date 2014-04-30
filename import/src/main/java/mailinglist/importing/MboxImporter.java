@@ -33,12 +33,13 @@ import net.fortuna.mstor.MStorFolder;
  */
 public class MboxImporter {
 
-    private static final long TIME_TO_WAIT_FOR_THREADS = 50;
     private static String DATABASE_PROPERTIES_FILE_NAME = "database.properties";
 	private DbClient messageSaver;
 	private boolean saveAlsoToSearchisko;
 
     /**
+     * Method callable from terminal, called with the path specifying the folder of mbox files or an mbox file itself.
+     * 
      * @param args the command line arguments
      */
     public static void main(String[] args) throws NoSuchProviderException, MessagingException, IOException {
@@ -97,11 +98,14 @@ public class MboxImporter {
            
         }
         executor.shutdown();
-
+        boolean executorFinished=false;
         try {
-        	executor.awaitTermination(TIME_TO_WAIT_FOR_THREADS, TimeUnit.SECONDS);
+        	executorFinished=executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
          } catch (InterruptedException ex) {
          } 
+        if(!executorFinished) {
+        	System.err.println("Executor was interrupted or the operation took too long. Not all the emails were saved.");
+        }
         store.close();
     }
 

@@ -2,6 +2,7 @@ package mailinglistonline.server.export.searchisko;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 public class SearchiskoConfiguration {
@@ -29,12 +30,12 @@ public class SearchiskoConfiguration {
 		this.password = password;
 	}
 	
-	public SearchiskoConfiguration readFromPropertyFile(String path) {
+	public SearchiskoConfiguration readFromPropertyFile(InputStream stream) {
 		Properties prop = new Properties();
 		try {
-			prop.load(new FileInputStream(path));
+			prop.load(stream);
 		} catch (IOException e) {
-			throw new IllegalArgumentException("Readingsearchisko configuration file threw and exception for file path " + path, e);
+			throw new IllegalArgumentException("Readingsearchisko configuration file threw and exception for file stream ", e);
 		}
         searchiskoUrl = prop.getProperty("searchiskoUrl");
         username = prop.getProperty("username");

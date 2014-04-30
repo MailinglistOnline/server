@@ -34,10 +34,12 @@ import javax.mail.internet.MimeMessage;
 import mailinglist.MessageManager;
 import mailinglist.importing.MboxImporter;
 import mailinglist.importing.MessageReceiver;
+import mailinglistonline.server.export.database.DatabaseConfiguration;
 import mailinglistonline.server.export.database.DbClient;
 import mailinglistonline.server.export.database.entities.ContentPart;
 import mailinglistonline.server.export.database.entities.Email;
 import mailinglistonline.server.export.database.entities.MiniEmail;
+import mailinglistonline.server.export.util.PropertiesParser;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -50,7 +52,7 @@ import com.mongodb.gridfs.GridFSDBFile;
 
 /**
  *
- * @author matej
+ * @author Matej Briškár
  */
 public class ImportingTest {
 
@@ -60,13 +62,17 @@ public class ImportingTest {
     public static final String BINARIES_MAIL_PATH ="src/test/java/mboxes/oneimageonedoublepdfodt.mbox";
     public static final String MBOX_FOLDER_PATH ="src/test/java/mboxes/folder";
     private DbClient dbClient;
-    private int mongoPort = 27017;
-    private String mongoUrl = "localhost";
-    private String databaseName = "testdb";
-    private String collectionName = "test";
+    private DatabaseConfiguration configuration;
+    private static final String TEST_COLLECTION_NAME = "test";
 
     public ImportingTest() throws UnknownHostException {
-        dbClient = new DbClient(mongoUrl, databaseName, mongoPort, collectionName);
+        configuration = PropertiesParser.parseDatabaseConfigurationFile(MboxImporter.class
+				.getClass()
+				.getResource((DbClient.DATABASE_PROPERTIES_FILE_NAME))
+				.getPath());
+        configuration.setDefaultCollectionName(TEST_COLLECTION_NAME);
+        dbClient = new DbClient(configuration);
+        dbClient.dropTable();
     }
 
     @BeforeClass
@@ -94,7 +100,6 @@ public class ImportingTest {
         assertEquals(dbClient.emailCount(), 62);
         mbox.importMbox(TEST_MAILS_PATH);
         assertEquals(dbClient.emailCount(), 62);
-        writeDBItems();
 
     }
 
@@ -106,7 +111,6 @@ public class ImportingTest {
         assertEquals(72+62+1, dbClient.emailCount());
         mbox.importMboxDirectory(MBOX_FOLDER_PATH);
         assertEquals( "Any email should not be added twice",72+62+1,dbClient.emailCount());
-        writeDBItems();
     }
     
     @Test
@@ -308,13 +312,12 @@ public class ImportingTest {
         }
         InputStream testInput = new ByteArrayInputStream(output.getBytes("UTF-8"));
         System.setIn(testInput);
-        String[] args = {mongoUrl, databaseName, String.valueOf(mongoPort), collectionName,"false"};
+        String[] args = {configuration.getDatabaseUrl(), configuration.getDefaultDatabaseName(), String.valueOf(configuration.getDefaultPort()), configuration.getDefaultCollectionName(), configuration.getUser(), configuration.getPassword(),"false"};
         MessageReceiver.main(args);
         testInput.close();
         assertEquals(1, dbClient.emailCount());
         Email email = (Email) dbClient.findFirstMessageWithMessageId("<4E7CA9DA.9040904@gmail.com>");
         assertTrue(email.getMessageId().equals("<4E7CA9DA.9040904@gmail.com>"));
         assertTrue(email.getFrom().equals("martin.kyrc@gmail.com"));
-        writeDBItems();
     }
 }

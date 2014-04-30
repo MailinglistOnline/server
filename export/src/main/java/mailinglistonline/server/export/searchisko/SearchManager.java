@@ -25,7 +25,7 @@ public class SearchManager {
 
 		public SearchManager() {
 			this(new SearchiskoConfiguration().readFromPropertyFile(
-					SearchManager.class.getClass().getResource((SERVER_PROPERTIES_FILE_NAME)).getPath()),false);
+					SearchManager.class.getResourceAsStream((SERVER_PROPERTIES_FILE_NAME))),false);
 		}
 		
 		public SearchManager(SearchiskoConfiguration configuration, boolean authentication) {

@@ -11,7 +11,7 @@ public class SearchManagerProxy {
 
 	public SearchManagerProxy(){
 		this.searchManager= new SearchManager(new SearchiskoConfiguration().readFromPropertyFile(
-				SearchManager.class.getClassLoader().getResource((SERVER_PROPERTIES_FILE_NAME)).getPath()),true);
+				SearchManager.class.getClassLoader().getResourceAsStream((SERVER_PROPERTIES_FILE_NAME))),true);
 	}
 
 	public boolean addEmail(Email email) {

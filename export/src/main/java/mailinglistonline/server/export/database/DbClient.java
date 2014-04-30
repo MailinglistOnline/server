@@ -59,9 +59,7 @@ public class DbClient {
 
 	public DbClient() throws UnknownHostException, IOException {
 		this(PropertiesParser.parseDatabaseConfigurationFile(DbClient.class
-				.getClass()
-				.getResource(DATABASE_PROPERTIES_FILE_NAME)
-				.getPath()));
+				.getResourceAsStream(DATABASE_PROPERTIES_FILE_NAME)));
 	}
 
 	public DbClient(DatabaseConfiguration configuration) {
@@ -80,27 +78,8 @@ public class DbClient {
 	}
 
 	public void readMailinglists() {
-		Properties prop = new Properties();
-		try {
-			prop.load(DbClient.class.getClass().getResourceAsStream(
-					(MAILINGLISTS_PROPERTIES_FILE_NAME)));
-		} catch (IOException e) {
-			throw new IllegalArgumentException(
-					"Unable to read mailinglist property file.");
-		}
-		String mailinglist = prop.getProperty("mailinglist." + 1);
-		int i = 1;
-		while (mailinglist != null) {
-			Mailinglist mlist = new Mailinglist();
-			mlist.setName(mailinglist);
-			String description = prop.getProperty("mailinglist.description."
-					+ i);
-			mlist.setDescription(description);
-			mailingLists.add(mlist);
-			i++;
-			mailinglist = prop.getProperty("mailinglist." + i);
-		}
-
+		mailingLists = PropertiesParser.parseMailinglistConfigurationFile((DbClient.class
+				.getResourceAsStream(MAILINGLISTS_PROPERTIES_FILE_NAME)));
 	}
 
 	@Deprecated
@@ -349,14 +328,6 @@ public class DbClient {
 	public List<Mailinglist> getMailingLists() {
 		return mailingLists;
 	}
-
-	/*
-	 * Should not be needed as the MiniEmail replies are now stored inside the
-	 * email public List<Email> getEmailReplies(String id) { Email email =
-	 * getEmailWithId(id); List<Email> result = new ArrayList<Email>(); for
-	 * (String replyId : email.getReplies()) {
-	 * result.add(getEmailWithId(replyId)); } return result; }
-	 */
 
 	public void addTagToEmail(String emailId, String tag) {
 		Email email = getEmailWithId(emailId);

@@ -15,7 +15,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class PerformanceOutputTest {
+/*
+ * This tests do not run from the maven test phase, because they end with 'Tests'. These classes are just giving the output
+ * of the importing part, which has no limitations right now (=> no assertions).
+ */
+public class PerformanceOutputTests {
 
     public static final String TEST_MAILS_PATH = "src/test/java/mboxes/test-mails";
     public static final String TEST_MAILS_PATH2 ="src/test/java/mboxes/test-mails2";
@@ -27,7 +31,7 @@ public class PerformanceOutputTest {
     private String databaseName = "testdb";
     private String collectionName = "test";
 
-    public PerformanceOutputTest() throws UnknownHostException {
+    public PerformanceOutputTests() throws UnknownHostException {
         dbClient = new DbClient(mongoUrl, databaseName, mongoPort, collectionName);
     }
 

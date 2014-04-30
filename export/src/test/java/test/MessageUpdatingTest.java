@@ -63,6 +63,7 @@ public class MessageUpdatingTest {
 				.getResource(DbClient.DATABASE_PROPERTIES_FILE_NAME)
 				.getPath());
        configuration.setDefaultCollectionName("test");
+       configuration.setDatabaseUrl("127.0.0.1");
        dbClient = new DbClient(configuration);
        dbClient.dropTable();
    }
