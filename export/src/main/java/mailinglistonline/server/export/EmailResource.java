@@ -52,6 +52,9 @@ public class EmailResource {
 	@Produces("application/json")
 	public Email getEmailById(@PathParam("id") String id) {
 		Email email = dbClient.getEmailWithId(id);
+		if(email == null) {
+			return null;
+		}
 		ObjectId objectId = (ObjectId) email.get("_id");
 		email.setId(objectId.toStringMongod());
 		return email;
