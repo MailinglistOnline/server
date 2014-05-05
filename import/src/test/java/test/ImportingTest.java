@@ -63,7 +63,7 @@ public class ImportingTest {
     public static final String MBOX_FOLDER_PATH ="src/test/java/mboxes/folder";
     private DbClient dbClient;
     private DatabaseConfiguration configuration;
-    private static final String TEST_COLLECTION_NAME = "test";
+    static final String TEST_COLLECTION_NAME = "test";
 
     public ImportingTest() throws UnknownHostException {
         configuration = PropertiesParser.parseDatabaseConfigurationFile(MboxImporter.class

@@ -111,6 +111,7 @@ public class MboxImporter {
 
     public void importMbox(String mboxPath) throws NoSuchProviderException, MessagingException, IOException {
     	if(! (mboxPath.endsWith(".mbox")|| mboxPath.endsWith(".txt") ) ) {
+    		System.err.println("File " + mboxPath + " doesn't end with .mbox nor .txt");
     		return;
     	}
         File file = new File(mboxPath);

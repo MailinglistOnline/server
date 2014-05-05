@@ -7,7 +7,9 @@ import javax.mail.MessagingException;
 import javax.mail.NoSuchProviderException;
 
 import mailinglist.importing.MboxImporter;
+import mailinglistonline.server.export.database.DatabaseConfiguration;
 import mailinglistonline.server.export.database.DbClient;
+import mailinglistonline.server.export.util.PropertiesParser;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -21,18 +23,24 @@ import org.junit.Test;
  */
 public class PerformanceOutputTests {
 
-    public static final String TEST_MAILS_PATH = "src/test/java/mboxes/test-mails";
+    public static final String TEST_MAILS_PATH = "src/test/java/mboxes/test-mails.mbox";
     public static final String TEST_MAILS_PATH2 ="src/test/java/mboxes/test-mails2";
     public static final String SIMPLE_MAIL_PATH ="src/test/java/mboxes/simpleMail";
     public static final String MBOX_FOLDER_PATH ="src/test/java/mboxes/folder";
     private DbClient dbClient;
-    private int mongoPort = 27017;
-    private String mongoUrl = "localhost";
-    private String databaseName = "testdb";
-    private String collectionName = "test";
+    private DatabaseConfiguration configuration;
 
     public PerformanceOutputTests() throws UnknownHostException {
-        dbClient = new DbClient(mongoUrl, databaseName, mongoPort, collectionName);
+    	long before = System.currentTimeMillis();
+        configuration = PropertiesParser.parseDatabaseConfigurationFile(MboxImporter.class
+				.getClass()
+				.getResource((DbClient.DATABASE_PROPERTIES_FILE_NAME))
+				.getPath());
+        configuration.setDefaultCollectionName(ImportingTest.TEST_COLLECTION_NAME);
+        dbClient = new DbClient(configuration);
+        dbClient.dropTable();
+        long after = System.currentTimeMillis();
+        System.out.println("The DBclient initialization took " + (after-before) + "ms");
     }
 
     @BeforeClass
@@ -56,7 +64,7 @@ public class PerformanceOutputTests {
     public void testMboxNumberOfMessages() throws UnknownHostException, NoSuchProviderException, MessagingException, IOException {
     	long before = System.currentTimeMillis();
     	MboxImporter mbox = new MboxImporter(dbClient,false);
-    	for (int i =0;i<100;i++) {
+    	for (int i =0;i<10;i++) {
     		mbox.importMbox(TEST_MAILS_PATH);
             tearDown();
     	}
