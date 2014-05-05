@@ -4,6 +4,23 @@
  */
 package mailinglistonline.server.export.database;
 
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PreDestroy;
+import javax.ejb.Singleton;
+
+import mailinglistonline.server.export.database.entities.ContentPart;
+import mailinglistonline.server.export.database.entities.Email;
+import mailinglistonline.server.export.database.entities.Mailinglist;
+import mailinglistonline.server.export.database.entities.MiniEmail;
+import mailinglistonline.server.export.searchisko.SearchManager;
+import mailinglistonline.server.export.util.PropertiesParser;
+
+import org.bson.types.ObjectId;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
@@ -14,30 +31,6 @@ import com.mongodb.WriteConcern;
 import com.mongodb.gridfs.GridFS;
 import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
-
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.regex.Pattern;
-
-import javax.annotation.PreDestroy;
-import javax.ejb.Singleton;
-import javax.ejb.Stateless;
-import javax.faces.bean.ApplicationScoped;
-import javax.mail.MessagingException;
-
-import mailinglistonline.server.export.database.entities.ContentPart;
-import mailinglistonline.server.export.database.entities.Email;
-import mailinglistonline.server.export.database.entities.Mailinglist;
-import mailinglistonline.server.export.database.entities.MiniEmail;
-import mailinglistonline.server.export.searchisko.SearchManager;
-import mailinglistonline.server.export.searchisko.SearchiskoConfiguration;
-import mailinglistonline.server.export.searchisko.SearchiskoResponseParser;
-import mailinglistonline.server.export.util.PropertiesParser;
-
-import org.bson.types.ObjectId;
 
 /**
  * 
@@ -96,9 +89,10 @@ public class DbClient {
 		if(user != null && password !=null) {
 			db.authenticate(user, password.toCharArray());
 		}
-		mongoClient.setWriteConcern(WriteConcern.SAFE);
+		mongoClient.setWriteConcern(WriteConcern.ACKNOWLEDGED);
 		coll = db.getCollection(collectionName);
 		coll.setObjectClass(Email.class);
+		// MongoDB JAVA-254 issue
 		coll.setInternalClass(Email.IN_REPLY_TO_MONGO_TAG, MiniEmail.class);
 		coll.setInternalClass(Email.ROOT_MONGO_TAG, MiniEmail.class);
 		coll.setInternalClass(Email.REPLIES_MONGO_TAG + ".0", MiniEmail.class);
@@ -271,9 +265,7 @@ public class DbClient {
 	}
 
 	public boolean updateEmail(Email newEmail) throws IOException {
-
 		coll.save(newEmail);
-
 		return true;
 	}
 
@@ -426,6 +418,20 @@ public class DbClient {
 			cursor.close();
 		}
 		return emails;
+	}
+
+	public void removeTagFromEmail(String id, String tag) {
+		Email email = getEmailWithId(id);
+		if ((email.getTags() == null) || (!email.getTags().contains(tag))) {
+			return;
+		}
+		email.removeTag(tag);
+		try {
+			updateEmail(email);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 
 }

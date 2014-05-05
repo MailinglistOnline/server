@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -139,6 +140,13 @@ public class EmailResource {
 	public void addTag(@QueryParam("id") String id,
 			@QueryParam("tag") String tag) {
 		dbClient.addTagToEmail(id, tag);
+	}
+	
+	@DELETE
+	@Path("/email/tag/")
+	public void removeTag(@QueryParam("id") String id,
+			@QueryParam("tag") String tag) {
+		dbClient.removeTagFromEmail(id, tag);
 	}
 
 	// NOW COMES THE SEARCH METHODS:

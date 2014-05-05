@@ -151,6 +151,14 @@ public class MiniEmail extends BasicDBObject{
         }
         list.add(tag);
     }
+    
+    public void removeTag(String tag) {
+        ArrayList<String>list = (ArrayList<String>)get(TAGS_MONGO_TAG);
+        if(list == null) {
+            throw new IllegalArgumentException("Email does not contain tag '" + tag + "'.");
+        }
+        list.remove(tag);
+    }
 
 
 	
