@@ -329,6 +329,7 @@ public class DbClient {
 		email.addTag(tag);
 		try {
 			updateEmail(email);
+			searchManager.addEmail(email);
 		} catch (IOException e) {
 
 			e.printStackTrace();
