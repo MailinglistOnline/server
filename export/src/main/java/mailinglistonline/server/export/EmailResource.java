@@ -17,6 +17,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import mailinglistonline.server.export.database.DbClient;
+import mailinglistonline.server.export.database.MongoDbClient;
+import mailinglistonline.server.export.database.SearchClient;
 import mailinglistonline.server.export.database.entities.Email;
 import mailinglistonline.server.export.database.entities.MiniEmail;
 
@@ -35,6 +37,8 @@ public class EmailResource {
 	private static final String MAILINGLIST_REPRESENTING_ALL = "all";
 	@Inject
 	DbClient dbClient;
+	@Inject
+	SearchClient searchClient;
 
 	public EmailResource() throws UnknownHostException, IOException {
 
@@ -126,14 +130,14 @@ public class EmailResource {
 
 	}
 
-	@GET
+	/*@GET
 	@Path("/email/")
 	@Produces("application/json")
 	public List<Email> getEmails(@QueryParam("mailinglist") String mailinglist,
 			@QueryParam("from") String from, @QueryParam("tag") List<String> tag) {
 		return normalizeIds(dbClient.getEmailsNotStrictMatch(mailinglist, from,
 				tag));
-	}
+	}*/
 
 	@POST
 	@Path("/email/tag/")
@@ -156,7 +160,7 @@ public class EmailResource {
 	public List<MiniEmail> searchEmailByContent(
 			@QueryParam("content") String content) {
 		// TODO: when used searchisko filtering, do not forget for the all
-		List<MiniEmail> emails = dbClient.searchByContent(content);
+		List<MiniEmail> emails = searchClient.searchByContent(content);
 		return emails;
 	}
 

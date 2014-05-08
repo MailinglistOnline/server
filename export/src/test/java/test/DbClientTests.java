@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mailinglistonline.server.export.database.DatabaseConfiguration;
-import mailinglistonline.server.export.database.DbClient;
+import mailinglistonline.server.export.database.MongoDbClient;
 import mailinglistonline.server.export.database.entities.Email;
 import mailinglistonline.server.export.database.entities.MiniEmail;
 import mailinglistonline.server.export.util.PropertiesParser;
@@ -30,17 +30,17 @@ import static org.junit.Assert.*;
 @RunWith(Arquillian.class)
 public class DbClientTests {
 
-    private DbClient dbClient;
+    private MongoDbClient dbClient;
     private ArrayList<Email> insertedEmails;
 
     public DbClientTests() throws UnknownHostException, IOException {
-        DatabaseConfiguration configuration = PropertiesParser.parseDatabaseConfigurationFile(DbClient.class
+        DatabaseConfiguration configuration = PropertiesParser.parseDatabaseConfigurationFile(MongoDbClient.class
 				.getClass()
-				.getResource((DbClient.DATABASE_PROPERTIES_FILE_NAME))
+				.getResource((MongoDbClient.DATABASE_PROPERTIES_FILE_NAME))
 				.getPath());
         configuration.setDefaultCollectionName("test");
         configuration.setDatabaseUrl("127.0.0.1");
-        dbClient = new DbClient(configuration);
+        dbClient = new MongoDbClient(configuration);
         dbClient.dropTable();
     }
     
