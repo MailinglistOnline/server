@@ -36,6 +36,7 @@ import mailinglist.importing.MboxImporter;
 import mailinglist.importing.MessageReceiver;
 import mailinglistonline.server.export.database.DatabaseConfiguration;
 import mailinglistonline.server.export.database.DbClient;
+import mailinglistonline.server.export.database.MongoDbClient;
 import mailinglistonline.server.export.database.entities.ContentPart;
 import mailinglistonline.server.export.database.entities.Email;
 import mailinglistonline.server.export.database.entities.MiniEmail;
@@ -68,10 +69,10 @@ public class ImportingTest {
     public ImportingTest() throws UnknownHostException {
         configuration = PropertiesParser.parseDatabaseConfigurationFile(MboxImporter.class
 				.getClass()
-				.getResource((DbClient.DATABASE_PROPERTIES_FILE_NAME))
+				.getResource((MongoDbClient.DATABASE_PROPERTIES_FILE_NAME))
 				.getPath());
         configuration.setDefaultCollectionName(TEST_COLLECTION_NAME);
-        dbClient = new DbClient(configuration);
+        dbClient = new MongoDbClient(configuration);
         dbClient.dropTable();
     }
 
