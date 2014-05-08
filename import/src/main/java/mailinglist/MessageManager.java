@@ -23,6 +23,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import mailinglistonline.server.export.database.DbClient;
+import mailinglistonline.server.export.database.MongoDbClient;
 import mailinglistonline.server.export.database.entities.ContentPart;
 import mailinglistonline.server.export.database.entities.Email;
 
@@ -56,7 +57,7 @@ public class MessageManager {
         searchManager = new SearchManagerProxy();
         mailingLists = new ArrayList<String>();
         Properties prop = new Properties();
-        prop.load(DbClient.class.getClassLoader().getResourceAsStream((MAILINGLISTS_PROPERTIES_FILE_NAME)));
+        prop.load(MongoDbClient.class.getClassLoader().getResourceAsStream((MAILINGLISTS_PROPERTIES_FILE_NAME)));
         String mailinglist = prop.getProperty("mailinglist." + 1);
         int i = 1;
         while (mailinglist != null) {
