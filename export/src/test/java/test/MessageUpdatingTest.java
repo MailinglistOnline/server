@@ -30,6 +30,7 @@ import javax.mail.internet.MimeMessage;
 
 import mailinglistonline.server.export.database.DatabaseConfiguration;
 import mailinglistonline.server.export.database.DbClient;
+import mailinglistonline.server.export.database.MongoDbClient;
 import mailinglistonline.server.export.database.entities.ContentPart;
 import mailinglistonline.server.export.database.entities.Email;
 import mailinglistonline.server.export.database.entities.MiniEmail;
@@ -58,13 +59,13 @@ public class MessageUpdatingTest {
    private DbClient dbClient;
 
    public MessageUpdatingTest() throws UnknownHostException {
-	   DatabaseConfiguration configuration = PropertiesParser.parseDatabaseConfigurationFile(DbClient.class
+	   DatabaseConfiguration configuration = PropertiesParser.parseDatabaseConfigurationFile(MongoDbClient.class
 				.getClass()
-				.getResource(DbClient.DATABASE_PROPERTIES_FILE_NAME)
+				.getResource(MongoDbClient.DATABASE_PROPERTIES_FILE_NAME)
 				.getPath());
        configuration.setDefaultCollectionName("test");
        configuration.setDatabaseUrl("127.0.0.1");
-       dbClient = new DbClient(configuration);
+       dbClient = new MongoDbClient(configuration);
        dbClient.dropTable();
    }
 

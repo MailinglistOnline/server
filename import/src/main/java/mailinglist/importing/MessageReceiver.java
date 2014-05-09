@@ -12,7 +12,7 @@ import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
 import mailinglistonline.server.export.database.DatabaseConfiguration;
-import mailinglistonline.server.export.database.DbClient;
+import mailinglistonline.server.export.database.MongoDbClient;
 import mailinglist.MessageManager;
 
 /**
@@ -38,7 +38,7 @@ public class MessageReceiver {
         System.out.println("Message received through the terminal");
         System.out.println("Message ID: " + message.getMessageID());
         System.out.println("Message content: " + message.getContent().toString());
-        DbClient messageSaver;
+        MongoDbClient messageSaver;
         boolean sendMessageAlsoToSearchisko = true;
         if(args.length > 5) {
         	DatabaseConfiguration conf = new DatabaseConfiguration();
@@ -50,10 +50,10 @@ public class MessageReceiver {
         		conf.setUser(args[4]);
             	conf.setPassword(args[5]);
         	}
-            messageSaver= new DbClient(conf);
+            messageSaver= new MongoDbClient(conf);
             sendMessageAlsoToSearchisko=Boolean.valueOf(args[6]);
         } else {
-        	messageSaver = new DbClient();
+        	messageSaver = new MongoDbClient();
         }
         MessageManager manager= new MessageManager(messageSaver,sendMessageAlsoToSearchisko);
         manager.createAndSaveMessage(message);

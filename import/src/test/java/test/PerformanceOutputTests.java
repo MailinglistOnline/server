@@ -9,6 +9,7 @@ import javax.mail.NoSuchProviderException;
 import mailinglist.importing.MboxImporter;
 import mailinglistonline.server.export.database.DatabaseConfiguration;
 import mailinglistonline.server.export.database.DbClient;
+import mailinglistonline.server.export.database.MongoDbClient;
 import mailinglistonline.server.export.util.PropertiesParser;
 
 import org.junit.After;
@@ -34,10 +35,10 @@ public class PerformanceOutputTests {
     	long before = System.currentTimeMillis();
         configuration = PropertiesParser.parseDatabaseConfigurationFile(MboxImporter.class
 				.getClass()
-				.getResource((DbClient.DATABASE_PROPERTIES_FILE_NAME))
+				.getResource((MongoDbClient.DATABASE_PROPERTIES_FILE_NAME))
 				.getPath());
         configuration.setDefaultCollectionName(ImportingTest.TEST_COLLECTION_NAME);
-        dbClient = new DbClient(configuration);
+        dbClient = new MongoDbClient(configuration);
         dbClient.dropTable();
         long after = System.currentTimeMillis();
         System.out.println("The DBclient initialization took " + (after-before) + "ms");

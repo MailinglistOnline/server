@@ -44,7 +44,9 @@ public class MiniEmail extends BasicDBObject{
     	setMailingList(email.getMessageMailingList());
     	setMessageId(email.getMessageId());
     	setSubject(email.getSubject());
-    	setDate(email.getDate());
+    	if (email.getDate() !=null) {
+    		setDate(email.getDate());
+    	}
     	setFrom(email.getFrom());
     	setMessageSnippet(email.getMessageSnippet());
     	setTags(email.getTags());
@@ -93,8 +95,9 @@ public class MiniEmail extends BasicDBObject{
     }
     
     @XmlElement(name=DATE_MONGO_TAG)
-    public long getDate() {
-        return getLong(DATE_MONGO_TAG);
+    public Long getDate() {
+    	Long date = (Long)get(DATE_MONGO_TAG);
+        return date;
     }
 
     public void setDate(long sentDate) {

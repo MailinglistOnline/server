@@ -2,6 +2,8 @@ package mailinglistonline.server.export.searchisko;
 
 import java.util.List;
 
+import javax.ejb.Singleton;
+
 import mailinglistonline.server.export.database.entities.Email;
 import mailinglistonline.server.export.database.entities.MiniEmail;
 
@@ -16,8 +18,8 @@ import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
 
-
-public class SearchManager {
+@Singleton
+public class SearchManager implements SearchClient{
 
 	    private static String SERVER_PROPERTIES_FILE_NAME = "/searchisko.properties";
 		private SearchiskoConfiguration configuration;
@@ -38,7 +40,7 @@ public class SearchManager {
 			}
 		}
 		
-		public List<MiniEmail> searchEmailByContent(String mainContent) {
+		public List<MiniEmail> searchByContent(String mainContent) {
 			SearchiskoResponseParser parser= new SearchiskoResponseParser();
 			parser.parse(emailClient.searchEmailByContent(mainContent, true));
 			return parser.getEmails();
@@ -69,6 +71,11 @@ public class SearchManager {
 		public boolean removeEmail(String id) {
 			emailClient.deleteEmail(id, true);
 			return true;
+		}
+
+		@Override
+		public boolean updateEmail(Email email) {
+			return addEmail(email);
 		}
 	
 }
