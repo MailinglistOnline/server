@@ -514,4 +514,28 @@ public class MongoDbClient implements DbClient{
 		
 	}
 
+	@Override
+	public List<Email> getMailinglistRoot(Object mailinglist, int fromNumber,
+			int toNumber) {
+		BasicDBObject query = new BasicDBObject();
+		query.append(Email.ROOT_MONGO_TAG, MAIL_IS_ROOT_VALUE);
+		query.append(Email.MAILINGLIST_MONGO_TAG, mailinglist);
+		DBCursor find = coll.find(query);
+		find.skip(fromNumber);
+		find.limit(toNumber-fromNumber);
+		List<Email> emails = new ArrayList<Email>();
+		while (find.hasNext()) {
+			Email next = (Email) find.next();
+			emails.add(next);
+		}
+		find.close();
+		return emails;
+	}
+	
+	public int getMailinglistRootCount(String mailinglist) {
+		// should be refactored to cursor.count()
+		List<Email> mailinglistRoot = getMailinglistRoot(mailinglist);
+		return mailinglistRoot.size();
+	};
+
 }

@@ -107,16 +107,19 @@ public class EmailResource {
 		if (toNumber == 0) {
 			return getMailingListRoots(mailinglist);
 		}
-		List<Email> list = normalizeIds(dbClient
-				.getMailinglistRoot(mailinglist));
-		if (fromNumber > toNumber) {
+		if (fromNumber > toNumber || fromNumber < 0 || toNumber<0) {
 			return new ArrayList<Email>();
 		}
-		if (toNumber > list.size() - 1) {
-			toNumber = list.size();
-		}
-		return list.subList(fromNumber, toNumber);
-
+		List<Email> list = normalizeIds(dbClient
+				.getMailinglistRoot(mailinglist,fromNumber,toNumber));
+		return list;
+	}
+	
+	@GET
+	@Path("/{mailinglist}/roots/count")
+	@Produces("application/json")
+	public Integer getMailingListRootCount(@PathParam("mailinglist") String mailinglist) {
+		return dbClient.getMailinglistRootCount(mailinglist);
 	}
 
 	@GET
@@ -191,5 +194,5 @@ public class EmailResource {
 		}
 		return email;
 	}
-
+	
 }
