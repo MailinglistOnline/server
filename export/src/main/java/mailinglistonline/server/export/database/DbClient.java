@@ -54,6 +54,9 @@ public interface DbClient {
 
 	public String getId(String messageId, ArrayList<String> mailinglist);
 
+	/*
+	 * Get all the roots from the mailinglist. It is object so it is allowed to put there a regexp pattern.
+	 */
 	public List<Email> getMailinglistRoot(Object mailinglist);
 
 	public List<Mailinglist> getMailingLists();
@@ -64,5 +67,10 @@ public interface DbClient {
 			List<String> descending);
 
 	public void removeTagFromEmail(String id, String tag);
+
+	public List<Email> getMailinglistRoot(Object mailinglist, int fromNumber,
+			int toNumber);
+
+	public int getMailinglistRootCount(String mailinglist);
 
 }

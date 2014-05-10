@@ -15,6 +15,8 @@ import mailinglistonline.server.export.database.entities.Email;
 import mailinglistonline.server.export.database.entities.Mailinglist;
 import mailinglistonline.server.export.database.entities.MiniEmail;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBCursor;
 import com.mongodb.gridfs.GridFSDBFile;
 
 @Alternative
@@ -206,6 +208,17 @@ public class MockDbClient implements DbClient{
 	 */
 	@Override
 	public void removeTagFromEmail(String id, String tag) {
+	}
+	
+	@Override
+	public List<Email> getMailinglistRoot(Object mailinglist, int fromNumber,
+			int toNumber) {
+		return getMailinglistRoot(mailinglist);
+	}
+
+	@Override
+	public int getMailinglistRootCount(String mailinglist) {
+		return 3;
 	}
 
 }
