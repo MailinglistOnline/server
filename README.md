@@ -1,4 +1,4 @@
-# Server component.
+# Server component
 ======
 
 Server is a component containing 2 modules, [server-import](import)  and [server-export](export). 
