@@ -27,11 +27,13 @@ rest/mailinglists/all | List of all the mailinglists being processed on the serv
 rest/emails/search/content?content | Search emails using the given content string
 
 **POST METHODS**
+
 URL address  | Response
 ------------- | -------------
 /email/tag/?id,tag | Add the given {tag} to the email with the given {id}
 
 **DELETE METHODS**
+
 URL address  | Response
 ------------- | -------------
 /email/tag/?id,tag | Remove the given {tag} from the email with the given {id}
