@@ -8,6 +8,11 @@ import mailinglistonline.server.export.database.entities.MiniEmail;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
+/**
+ * Parser used to parse the data passed through Searchisko REST API defined in the {@link mailinglistonline.server.export.searchisko.SearchiskoInterface}.
+ * 
+ * @author Matej Briškár
+ */
 public class SearchiskoResponseParser {
 	private static final String SUBJECT_HIGHLIGHT = "subject";
 	private static final String MAIN_CONTENT_HIGHLIGHT = "main_content";

@@ -17,7 +17,11 @@ import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
 
-
+/**
+ * Manager implementing all the methods in {@link SearchClient} interface to access the Searchisko instance.
+ * 
+ * @author Matej Briškár
+ */
 @Singleton
 public class SearchManager implements SearchClient{
 

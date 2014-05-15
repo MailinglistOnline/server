@@ -13,7 +13,13 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 import com.mongodb.BasicDBObject;
 
-//@JsonIgnoreProperties({"_id"})
+/**
+ * Entity used to handle basic information about the email. This entity is good when only part of the information is needed.
+ * The scenarios where this entity is useful:
+ * 1. Basic information about the emails that the email is in connection with
+ * 2. To provide information about the list of requested emails.
+ * @author Matej Briškár
+ */
 @JsonAutoDetect(fieldVisibility=Visibility.NONE, getterVisibility=Visibility.NONE, isGetterVisibility=Visibility.NONE, setterVisibility=Visibility.NONE)
 public class MiniEmail extends BasicDBObject{
 

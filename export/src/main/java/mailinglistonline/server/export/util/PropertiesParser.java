@@ -11,6 +11,11 @@ import java.util.Properties;
 import mailinglistonline.server.export.database.DatabaseConfiguration;
 import mailinglistonline.server.export.database.entities.Mailinglist;
 
+/**
+ * The util class used to parse the .properties files.
+ * 
+ * @author Matej Briškár
+ */
 public class PropertiesParser {
 
 	public static DatabaseConfiguration parseDatabaseConfigurationFile(

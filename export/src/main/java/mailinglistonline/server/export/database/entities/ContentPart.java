@@ -10,8 +10,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- *
- * @author matej
+ * Entity used to save information about the content,attachments(files, signature etc.) of the email.
+ * @author Matej Briškár
  */
 @XmlRootElement(name = "ContentPart")
 public class ContentPart extends BasicDBObject{

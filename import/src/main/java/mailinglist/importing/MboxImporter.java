@@ -29,6 +29,7 @@ import mailinglistonline.server.export.util.PropertiesParser;
 import net.fortuna.mstor.MStorFolder;
 
 /**
+ *	Class capable of importing the emails saved in the .mbox files into the database.
  *
  * @author Matej Briškár
  */

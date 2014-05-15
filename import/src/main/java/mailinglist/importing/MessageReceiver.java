@@ -16,8 +16,9 @@ import mailinglistonline.server.export.database.MongoDbClient;
 import mailinglist.MessageManager;
 
 /**
+ *	Class capable of importing the emails pushed to the instance by the terminal into the database.
  *
- * @author matej
+ * @author Matej Briškár
  */
 public class MessageReceiver {
 

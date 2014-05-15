@@ -12,6 +12,11 @@ import javax.ws.rs.QueryParam;
 
 import mailinglistonline.server.export.database.entities.Email;
 
+/**
+ * Interface to the Searchisko REST API.
+ * 
+ * @author Matej Briškár
+ */
 @Path("/v1/rest")
 public interface SearchiskoInterface {
 

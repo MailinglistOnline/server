@@ -15,15 +15,8 @@ import javax.ws.rs.core.GenericEntity;
 import mailinglistonline.server.export.database.DbClient;
 import mailinglistonline.server.export.database.entities.Mailinglist;
 
-
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- *
+ * The REST interface to provide the processing mailinglists.
  * @author Matej Briškár
  */
 @ApplicationScoped

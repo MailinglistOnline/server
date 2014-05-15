@@ -4,6 +4,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
+/**
+ * Object containing the information about the MongoDB database instance.
+ * 
+ * @author Matej Briškár
+ */
 public class DatabaseConfiguration {
 	private Integer defaultPort;
     private String databaseUrl;

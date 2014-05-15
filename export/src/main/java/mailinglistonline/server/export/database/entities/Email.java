@@ -15,6 +15,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.annotate.JsonValue;
 
 /**
+ * The main entity used to store the emails.
  * 
  * @author Matej Briškár
  */

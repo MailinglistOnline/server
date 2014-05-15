@@ -5,6 +5,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * Object containing the information about the configuration for the searchisko instance.
+ * 
+ * @author Matej Briškár
+ */
 public class SearchiskoConfiguration {
 	private String searchiskoUrl;
 	private String username;

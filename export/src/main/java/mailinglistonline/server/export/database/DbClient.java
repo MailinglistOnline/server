@@ -11,6 +11,10 @@ import mailinglistonline.server.export.database.entities.MiniEmail;
 import com.mongodb.DBCollection;
 import com.mongodb.gridfs.GridFSDBFile;
 
+/**
+ * Interface containing all the methods that the client to the persistent store of the emails should have.
+ * @author Matej Briškár
+ */
 public interface DbClient {
 
 	public void dropTable();

@@ -33,7 +33,7 @@ import com.mongodb.gridfs.GridFSDBFile;
 import com.mongodb.gridfs.GridFSInputFile;
 
 /**
- * 
+ * MongoDB implementation of the DbClient interface. Accessing and storing emails in the MongoDB instance.
  * @author Matej Briškár
  */
 

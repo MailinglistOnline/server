@@ -26,6 +26,7 @@ import mailinglistonline.server.export.database.DbClient;
 import mailinglistonline.server.export.database.MongoDbClient;
 import mailinglistonline.server.export.database.entities.ContentPart;
 import mailinglistonline.server.export.database.entities.Email;
+import mailinglistonline.server.export.searchisko.SearchClient;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
@@ -37,13 +38,15 @@ import com.sun.mail.util.BASE64DecoderStream;
 import exceptions.MalformedMessageException;
 
 /**
- *
+ *	Object used to create an object from the data provided in the {@link MimeMessage} instance. Accessing the searchClient to send information to the Search provider and also
+ * the DbClient to save the data in the database.
+ * 
  * @author Matej Briškár
  */
 public class MessageManager {
 
     private DbClient dbClient;
-    private SearchManagerProxy searchManager;
+    private SearchClient searchManager;
     private final ArrayList<String> mailingLists;
 	private boolean sendMessagesToSearchisko=true;
     private static String MAILINGLISTS_PROPERTIES_FILE_NAME = "mailinglists.properties";

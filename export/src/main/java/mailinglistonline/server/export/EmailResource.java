@@ -25,10 +25,10 @@ import mailinglistonline.server.export.searchisko.SearchClient;
 import org.bson.types.ObjectId;
 
 /**
+ * The REST interface to provide the emails saved in the database according to the specified information in the URL.
  * 
  * @author Matej Briškár
  */
-
 @ApplicationScoped
 @Path("/emails")
 public class EmailResource {
@@ -51,7 +51,6 @@ public class EmailResource {
 		return normalizeIds(dbClient.getAllEmails());
 	}
 
-	// should be deleted after merge to only one method
 	@GET
 	@Path("/email/{id}")
 	@Produces("application/json")
