@@ -13,5 +13,25 @@ This folder consists of 3 files:
 
 Then run <pre><code>mvn clean install</code></pre> and deploy the application to a WildFly instance.
 ### REST API
-TODO
+**GET METHODS**
 
+URL address  | Response
+------------- | -------------
+rest/emails/all | Množina všetkých správ
+rest/emails/email/{id} | Email with the given ID
+rest/emails?from,mailinglist,tags,count,descending,ascending | Emails containing the given parameters being sorted by descending and ascending parameters.
+/{mailinglist}/roots/count | Number of the roots of all the threads in the given {mailinglist}
+rest/emails/{mailinglist}/roots/all | All the roots of the threads in the given {mailinglist}
+rest/emails/{mailinglist}/roots?from,to | Emails in the given {mailinglist} that are in the range of numbers.\\ \hline
+rest/mailinglists/all | List of all the mailinglists being processed on the server
+rest/emails/search/content?content | Search emails using the given content string
+
+**POST METHODS**
+URL address  | Response
+------------- | -------------
+/email/tag/?id,tag | Add the given {tag} to the email with the given {id}
+
+**DELETE METHODS**
+URL address  | Response
+------------- | -------------
+/email/tag/?id,tag | Remove the given {tag} from the email with the given {id}
