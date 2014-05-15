@@ -25,10 +25,14 @@ As it was already said, emails are stored in the MongoDB database, so they are s
 | subject | The subject of the email address       | 
 | from | Email address of the sender       | 
 | main\_content | List of JSON objects storing information about the main content of the message. Each object in the list have attributes **type** (type of the message, like "text/plain", "text/html" etc.) and **text** (contains the information about the text data)     | 
-| from | Email address of the sender       | 
-| from | Email address of the sender       | 
-| from | Email address of the sender       | 
+| message\_snippet | The first chars of the whole message stored in the main\_content attribute.       | 
+| mailinglist | Mailinglist to which the email belongs. Each email belong to only one mailinglist context.       | 
+| in\_reply\_to |  Basic information about the email that this message replied to. Attributes are: \_id,mailinglist, message\_id, subject, date, from, message\_snippet, tags      | 
+| thread\_root |  Basic information about the email that is the root of the thread to which this email belongs. Attributes are: \_id,mailinglist, message\_id, subject, date, from, message\_snippet, tags      | 
+| email\_shard\_key | A string that is used for sharding (splitting data among more servers) when the MongoDB sharding is on. It is based on the mailinglist and ID attributes.   | 
 
+#### Simple message example saved in the database
+```
 { 
   "_id" : ObjectId("11...b"), 
   "replies" : [ ], 
@@ -65,3 +69,4 @@ As it was already said, emails are stored in the MongoDB database, so they are s
       }, 
     "email_shard_key" : "linux-cluster@redhat.com11...b" 
 }
+```
